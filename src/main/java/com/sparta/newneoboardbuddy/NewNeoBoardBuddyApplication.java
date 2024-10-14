@@ -8,6 +8,7 @@ public class NewNeoBoardBuddyApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(NewNeoBoardBuddyApplication.class, args);
-    }
 
+
+    }
 }
