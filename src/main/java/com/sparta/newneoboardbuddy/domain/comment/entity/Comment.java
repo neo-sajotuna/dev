@@ -2,12 +2,14 @@ package com.sparta.newneoboardbuddy.domain.comment.entity;
 
 import com.sparta.newneoboardbuddy.common.entity.Timestamped;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Comment extends Timestamped {
 
     @Id
