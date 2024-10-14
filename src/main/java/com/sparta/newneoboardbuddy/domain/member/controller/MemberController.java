@@ -17,13 +17,4 @@ public class MemberController {
     private final MemberService memberService;
 
 
-    @GetMapping("/workspace/{workspaceId}/members/{id}")
-        public ResponseEntity<MemberResponse> getMember(
-                @PathVariable Long workspaceId,
-                @PathVariable Long id,
-                @AuthenticationPrincipal AuthUser authUser
-    ){
-            return ResponseEntity.ok(memberService.getMember(workspaceId,id, authUser));
-    }
-
 }

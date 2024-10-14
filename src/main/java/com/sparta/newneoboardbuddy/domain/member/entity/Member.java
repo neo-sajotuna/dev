@@ -1,6 +1,8 @@
 package com.sparta.newneoboardbuddy.domain.member.entity;
 
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
+import com.sparta.newneoboardbuddy.domain.user.entity.User;
+import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +24,7 @@ public class Member {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "workspace_id")
+    @JoinColumn(name = "space_id")
     private Workspace workspace;
 
     @Enumerated(EnumType.STRING)
