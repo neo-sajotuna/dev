@@ -14,6 +14,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    @ExceptionHandler(CommonException.class)
+    public ResponseEntity<Map<String, Object>> CommonException(CommonException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        return getErrorResponse(status, e.getMessage());
+    }
+
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<Map<String, Object>> invalidRequestExceptionException(InvalidRequestException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -34,9 +41,9 @@ public class GlobalExceptionHandler {
 
     public ResponseEntity<Map<String, Object>> getErrorResponse(HttpStatus status, String message) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("status", status.name());
-        errorResponse.put("code", status.value());
+        errorResponse.put("statusCode", status.value());
         errorResponse.put("message", message);
+        errorResponse.put("data", null);
 
         return new ResponseEntity<>(errorResponse, status);
     }
