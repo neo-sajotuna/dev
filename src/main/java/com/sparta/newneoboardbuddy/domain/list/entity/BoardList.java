@@ -1,5 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.list.entity;
 
+import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "list")
 public class BoardList {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
