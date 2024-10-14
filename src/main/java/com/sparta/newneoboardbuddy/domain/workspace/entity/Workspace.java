@@ -1,8 +1,12 @@
 package com.sparta.newneoboardbuddy.domain.workspace.entity;
 
+import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -11,10 +15,14 @@ import lombok.NoArgsConstructor;
 public class Workspace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long space_id;
+    private Long spaceId;
 
-    private String space_name;
+    private String spaceName;
 
-    private String contents;
+    private String content;
+
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
+    private List<Board> boards = new ArrayList<>();
+
 
 }
