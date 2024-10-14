@@ -1,7 +1,10 @@
 package com.sparta.newneoboardbuddy.domain.card.entity;
 
+import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.user.entity.User;
+import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,9 +35,6 @@ public class Card {
     @Column(name="finished_at")
     private LocalTime finishedAt;
 
-    @Column(name="member")
-    private String member;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardList_id", nullable = false)
     private BoardList boardList;
@@ -51,14 +51,14 @@ public class Card {
     private Board board;
 
     @ManyToOne(fetch =FetchType.LAZY)
-    @JoinColumn(name = " user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Card(String cardTitle, String cardContent, LocalTime finishedAt, String member, User user, BoardList list) {
+    public Card(String cardTitle, String cardContent, LocalTime finishedAt, User user, BoardList list) {
         this.cardTitle = cardTitle;
         this.cardContent = cardContent;
         this.finishedAt = finishedAt;
-        this.member = member;
+//        this.member = member;
         this.user = user;
         this.boardList = list;
 
