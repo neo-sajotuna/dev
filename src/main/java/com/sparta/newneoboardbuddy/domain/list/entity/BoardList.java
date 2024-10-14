@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "list")
 public class BoardList {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
