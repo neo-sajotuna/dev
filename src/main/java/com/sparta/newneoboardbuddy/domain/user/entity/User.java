@@ -35,10 +35,17 @@ public class User {
         this.userRole = userRole;
     }
 
+    public User(Long id) {
+        this.id = id;
+    }
+
     public static User fromAuthUser(AuthUser authUser) {
         return new User(authUser.getId(), authUser.getEmail(), (UserRole) authUser.getAuthorities().toArray()[0]);
     }
 
+    public static User fromUser(AuthUser authUser) {
+        return new User(authUser.getId());
+    }
     public void changePassword(String password) {
         this.password = password;
     }

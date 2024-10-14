@@ -7,7 +7,9 @@ import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
+import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,26 +19,27 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class CardService {
 
-    private final BoardListRepository boardListRepository;
+//    private final BoardListRepository boardListRepository;
     private final CardRepository cardRepository;
     private final MemberService memberService;
 
     public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
-        User user = User.fromAuthUser(authUser);
+        User user = User.fromUser(authUser);
 
-        memberService.getMember(user, request.getWorkspaceId());
+         memberService.memberPermission(authUser, user.getId(), request.getWorkspaceId());
 
         // 읽기 전용 유저 생성 못하게 예외처리
 
+//        BoardList list = boardListRepository.findById(listId).orElseThrow(() ->
+//                new InvalidRequestException("list not found"));
 
-        BoardList list = boardListRepository.findById(listId).orElseThrow(() ->
-                new InvalidRequestException("list not found"));
+        BoardList list = null;
 
         Card newCard = new Card(
                 request.getCardTitle(),
                 request.getCardContent(),
                 request.getFinishedAt(),
-                request.getMember(),
+//                request.getMember(),  얘 어떡할건데
                 user,
                 list
         );
