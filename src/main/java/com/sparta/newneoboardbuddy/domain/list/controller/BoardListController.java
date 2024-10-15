@@ -16,9 +16,9 @@ public class BoardListController {
 
     private final BoardListService boardListService;
 
-//    @PostMapping("/list")
-//    public BoardListResponse creatList(@AuthenticationPrincipal AuthUser authUser, @RequestBody BoardListRequest boardListRequest) {
-//        BoardListResponse response = boardListService.createList(authUser, boardListRequest);
-//        return response;
-//    }
+    @PostMapping("/list")
+    public BoardListResponse creatList(@AuthenticationPrincipal AuthUser authUser, @RequestBody BoardListRequest boardListRequest) {
+        BoardListResponse response = boardListService.createList(authUser, boardListRequest);
+        return response;
+    }
 }
