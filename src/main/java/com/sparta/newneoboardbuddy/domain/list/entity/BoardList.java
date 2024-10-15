@@ -35,4 +35,6 @@ public class BoardList {
     public BoardList(String title) {
         this.title = title;
     }
+    public void update(String title) { this.title = title; }
+    public void swapIndex(Long newIndex) { this.listIndex = newIndex; }
 }
