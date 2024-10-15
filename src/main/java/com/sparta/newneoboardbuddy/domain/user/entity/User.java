@@ -5,6 +5,7 @@ import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Getter
 @Entity
@@ -39,8 +40,13 @@ public class User {
         this.id = id;
     }
 
+
     public static User fromAuthUser(AuthUser authUser) {
-        return new User(authUser.getId(), authUser.getEmail(), (UserRole) authUser.getAuthorities().toArray()[0]);
+        // SimpleGrantedAuthority에서 권한 문자열을 가져와서 UserRole로 변환
+        String role = ((SimpleGrantedAuthority) authUser.getAuthorities().toArray()[0]).getAuthority();
+        UserRole userRole = UserRole.valueOf(role); // UserRole Enum과 매칭
+
+        return new User(authUser.getId(), authUser.getEmail(), userRole);
     }
 
     public static User fromUser(AuthUser authUser) {

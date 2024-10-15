@@ -26,7 +26,7 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
     private List<Board> boards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "workspace")
+    @OneToMany(mappedBy = "workspace",cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
 
