@@ -1,5 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.auth.service;
 
+import com.sparta.newneoboardbuddy.config.SlackNotificationUtil;
 import com.sparta.newneoboardbuddy.domain.auth.dto.request.SigninRequest;
 import com.sparta.newneoboardbuddy.domain.auth.dto.request.SignupRequest;
 import com.sparta.newneoboardbuddy.domain.auth.dto.request.WithdrawRequest;
@@ -25,6 +26,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SlackNotificationUtil slackNotificationUtil;
     private final JwtUtil jwtUtil;
 
     @Transactional
@@ -44,6 +46,8 @@ public class AuthService {
         );
 
         User savedUser = userRepository.save(newUser);
+
+        slackNotificationUtil.sendNewUser(savedUser);
 
         return new SignupResponse(savedUser);
     }

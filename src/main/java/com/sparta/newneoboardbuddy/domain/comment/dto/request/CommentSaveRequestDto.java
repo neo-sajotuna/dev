@@ -7,13 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class CommentSaveRequestDto {
-
     @NotNull(message = "카드 id 값은 필수 파라미터 입니다.")
     private Long cardId;
 
     @NotBlank(message = "comment 값은 필수 파라미터 입니다.")
     private String comment;
-
 }
