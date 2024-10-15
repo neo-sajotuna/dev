@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,14 @@ public class Card {
     @Column(name="card_content")
     private String cardContent;
 
+    @Column(name="started_at")
+    private LocalTime startedAt;
+
     @Column(name="finished_at")
     private LocalTime finishedAt;
+
+    @Column(name = "active_time")
+    private LocalDateTime activeTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardList_id", nullable = false)
@@ -58,9 +65,10 @@ public class Card {
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
-    public Card(String cardTitle, String cardContent, LocalTime finishedAt, Member member, User user, BoardList list) {
+    public Card(String cardTitle, String cardContent, LocalTime startedAt, LocalTime finishedAt, Member member, User user, BoardList list) {
         this.cardTitle = cardTitle;
         this.cardContent = cardContent;
+        this.startedAt = startedAt;
         this.finishedAt = finishedAt;
         this.member = member;
         this.user = user;
