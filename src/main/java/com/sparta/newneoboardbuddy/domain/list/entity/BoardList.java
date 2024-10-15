@@ -1,27 +1,36 @@
 package com.sparta.newneoboardbuddy.domain.list.entity;
 
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
+import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.mapping.Join;
+
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "list")
+@AllArgsConstructor
+@Table(name = "boardlist")
 public class BoardList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "list_id")
+    private Long listId;
 
     private String title;
 
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //private Long index;
+    private Long listIndex;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_id")
     private Board board;
+
+    @OneToMany(mappedBy = "boardList", cascade = CascadeType.ALL)
+    private List<Card> cards;
 
     public BoardList(String title) {
         this.title = title;

@@ -35,6 +35,7 @@ public class WorkspaceService {
     private final MemberService memberService;
 
     // 워크스페이스 생성
+    @Transactional
     public WorkspaceResponse createWorkspace(AuthUser authUser, WorkspaceRequest workspaceRequest) {
         User user = User.fromAuthUser(authUser);
 
@@ -43,11 +44,12 @@ public class WorkspaceService {
             throw new UnauthorizedActionException("워크스페이스를 생성할 권한이 없습니다.");
         }
 
+        Workspace workspace = new Workspace(workspaceRequest);
+
         // 워크스페이스 만든 유저를 멤버등록
-        Member member = new Member();
+        Member member = new Member(user, workspace, MemberRole.WORKSPACE_MEMBER);
         memberRepository.save(member);
 
-        Workspace workspace = new Workspace(workspaceRequest);
         workspaceRepository.save(workspace);
         return new WorkspaceResponse(workspace);
 
@@ -55,6 +57,7 @@ public class WorkspaceService {
 
     // 초대는 회원 가입한 이메일을 통해 이루어집니다.
     // 워크스페이스 멤버 초대
+    @Transactional
     public void inviteMember(AuthUser authUser, Long spaceId, String email, MemberRole memberRole) {
         User user = User.fromAuthUser(authUser);
         Workspace workspace = workspaceRepository.findById(spaceId)
@@ -88,6 +91,7 @@ public class WorkspaceService {
 
     // 워크스페이스 목록 조회
     // * 유저가 멤버로 가입된 워크스페이스 목록을 볼 수 있습니다.
+    @Transactional
     public Page<GetWorkspaceResponse> getWorkspace(int page, int size, AuthUser authUser) {
         Pageable pageable = PageRequest.of(page-1, size);
         User user = User.fromAuthUser(authUser);
@@ -119,7 +123,6 @@ public class WorkspaceService {
         }
 
         workspace.updateWorkspace(workspaceRequest.getSpaceName(), workspaceRequest.getContent());
-        workspaceRepository.save(workspace);
         return new UpdateWorkspaceResponse(workspace.getSpaceId(), workspace.getSpaceName(), workspace.getContent());
 
     }
@@ -127,6 +130,7 @@ public class WorkspaceService {
 
     //  * 삭제 시 워크스페이스 내의 모든 보드와 데이터도 삭제됩니다.
     // 워크스페이스 삭제
+    @Transactional
     public void deleteWorkspace(AuthUser authUser, Long spaceId) {
         User user = User.fromAuthUser(authUser);
 
