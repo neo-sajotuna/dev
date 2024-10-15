@@ -77,7 +77,7 @@ public class WorkspaceService {
 
         // 중복 초대 방지 (이미 해당 워크스페이스에 속한 멤버인지 확인)
         if(memberRepository.existsByUserAndWorkspace(invitedUser, member.getWorkspace())) {
-        throw new UserAlreadyMemberException("해당 유저는 이미 이 워크스페이스의 멤버입니다.");
+            throw new UserAlreadyMemberException("해당 유저는 이미 이 워크스페이스의 멤버입니다.");
         }
 
         // 새로운 멤버 생성 및 저장
@@ -146,3 +146,4 @@ public class WorkspaceService {
     }
 
 }
+

@@ -9,3 +9,4 @@ public class InviteMemberRequest {
     private MemberRole memberRole;
 
 }
+

@@ -28,8 +28,8 @@ public class WorkspaceController {
     // 워크스페이스 멤버 초대
     @PostMapping("/{spaceId}/member")
     public CommonResponseDto<String> inviteMember (@AuthenticationPrincipal AuthUser authUser,
-                                                @PathVariable Long spaceId,
-                                                @RequestBody InviteMemberRequest inviteMemberRequest) {
+                                                   @PathVariable Long spaceId,
+                                                   @RequestBody InviteMemberRequest inviteMemberRequest) {
         workspaceService.inviteMember(authUser, spaceId, inviteMemberRequest);
         return CommonResponseDto.success("워크스페이스에 해당 멤버를 초대하였습니다.");
     }
@@ -38,8 +38,8 @@ public class WorkspaceController {
     // 유저가 멤버로 가입된 워크스페이스 목록을 볼 수 있습니다.
     @GetMapping
     public CommonResponseDto<Page<GetWorkspaceResponse>> getWorkspace ( @RequestParam(defaultValue = "1", required = false) int page,
-                                                                     @RequestParam(defaultValue = "10", required = false) int size,
-                                                                     @AuthenticationPrincipal AuthUser authUser) {
+                                                                        @RequestParam(defaultValue = "10", required = false) int size,
+                                                                        @AuthenticationPrincipal AuthUser authUser) {
         return CommonResponseDto.success(workspaceService.getWorkspace(page, size, authUser));
     }
 
@@ -48,8 +48,8 @@ public class WorkspaceController {
     // 워크스페이스 수정
     @PutMapping("/{spaceId}")
     public CommonResponseDto<UpdateWorkspaceResponse> updateWorkspace(@AuthenticationPrincipal AuthUser authUser,
-                                                                   @PathVariable Long spaceId,
-                                                                   @RequestBody WorkspaceRequest workspaceRequest) {
+                                                                      @PathVariable Long spaceId,
+                                                                      @RequestBody WorkspaceRequest workspaceRequest) {
         return CommonResponseDto.success(workspaceService.updateWorkspace(authUser, spaceId, workspaceRequest));
     }
 
@@ -59,9 +59,10 @@ public class WorkspaceController {
     // 워크스페이스 삭제
     @DeleteMapping("/{spaceId}")
     public CommonResponseDto<String> deleteWorkspace(@AuthenticationPrincipal AuthUser authUser,
-                                                                   @PathVariable Long spaceId) {
+                                                     @PathVariable Long spaceId) {
         workspaceService.deleteWorkspace(authUser, spaceId);
         return CommonResponseDto.success("해당 워크스페이스가 삭제되었습니다.");
     }
 
 }
+
