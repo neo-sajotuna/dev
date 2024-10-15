@@ -12,9 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FileDeleteDto {
 
-    private final Long targetId;
+    private Long workspaceId;
 
-    private final String targetTable;
+    private Long targetId;
+
+    private String targetTable;
 
 }
 
