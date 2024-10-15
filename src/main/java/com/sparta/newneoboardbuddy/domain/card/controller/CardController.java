@@ -8,10 +8,10 @@ import com.sparta.newneoboardbuddy.domain.card.dto.response.CardDetailResponse;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardUpdateResponse;
 import com.sparta.newneoboardbuddy.domain.card.service.CardService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,9 +23,10 @@ public class CardController {
     public ResponseEntity<CardCreateResponse> createCard (
             @PathVariable Long listId,
             @RequestBody CardCreateRequest request,
-            @AuthenticationPrincipal AuthUser authUser
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam("file") MultipartFile file
     ){
-        return ResponseEntity.ok(cardService.createCard(listId ,authUser, request));
+        return ResponseEntity.ok(cardService.createCard(listId ,authUser, request, file));
     }
 
     @PutMapping ("/cards/{cardId}")
