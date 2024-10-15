@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +28,10 @@ public class CardController {
     public ResponseEntity<CardCreateResponse> createCard (
             @PathVariable Long listId,
             @RequestBody CardCreateRequest request,
-            @AuthenticationPrincipal AuthUser authUser
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam("file") MultipartFile file
     ){
-        return ResponseEntity.ok(cardService.createCard(listId ,authUser, request));
+        return ResponseEntity.ok(cardService.createCard(listId ,authUser, request, file));
     }
 
     @PutMapping ("/cards/{cardId}")

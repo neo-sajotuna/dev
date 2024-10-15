@@ -15,6 +15,8 @@ public class CommentUpdateResponseDto {
 
     private final String comment;
 
+    private final String emoji;
+
     private final LocalDateTime updatedAt;
 
 }
