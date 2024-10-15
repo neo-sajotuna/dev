@@ -40,4 +40,3 @@ public class Workspace {
         this.content = content;
     }
 }
-
