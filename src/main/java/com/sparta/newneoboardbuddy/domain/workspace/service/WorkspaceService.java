@@ -4,10 +4,10 @@ import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
-import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import com.sparta.newneoboardbuddy.domain.user.repository.UserRepository;
+import com.sparta.newneoboardbuddy.domain.workspace.dto.request.InviteMemberRequest;
 import com.sparta.newneoboardbuddy.domain.workspace.dto.request.WorkspaceRequest;
 import com.sparta.newneoboardbuddy.domain.workspace.dto.response.GetWorkspaceResponse;
 import com.sparta.newneoboardbuddy.domain.workspace.dto.response.UpdateWorkspaceResponse;
@@ -32,9 +32,9 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final MemberRepository memberRepository;
     private final UserRepository userRepository;
-    private final MemberService memberService;
 
     // 워크스페이스 생성
+    @Transactional
     public WorkspaceResponse createWorkspace(AuthUser authUser, WorkspaceRequest workspaceRequest) {
         User user = User.fromAuthUser(authUser);
 
@@ -43,19 +43,20 @@ public class WorkspaceService {
             throw new UnauthorizedActionException("워크스페이스를 생성할 권한이 없습니다.");
         }
 
-        // 워크스페이스 만든 유저를 멤버등록
-        Member member = new Member();
+        Workspace workspace = new Workspace(workspaceRequest);
+
+        // 워크스페이스 만든 유저를 멤버로 등록
+        Member member = new Member(user, workspace, MemberRole.WORKSPACE_MEMBER);
         memberRepository.save(member);
 
-        Workspace workspace = new Workspace(workspaceRequest);
         workspaceRepository.save(workspace);
         return new WorkspaceResponse(workspace);
 
     }
 
-    // 초대는 회원 가입한 이메일을 통해 이루어집니다.
     // 워크스페이스 멤버 초대
-    public void inviteMember(AuthUser authUser, Long spaceId, String email, MemberRole memberRole) {
+    @Transactional
+    public void inviteMember(AuthUser authUser, Long spaceId, InviteMemberRequest inviteMemberRequest) {
         User user = User.fromAuthUser(authUser);
         Workspace workspace = workspaceRepository.findById(spaceId)
                 .orElseThrow(() -> new WorkspaceNotFoundException("해당 워크스페이스가 없습니다"));
@@ -71,23 +72,22 @@ public class WorkspaceService {
         }
 
         // 존재하지 않는 이메일로 초대하는 경우
-        User invitedUser = userRepository.findByEmail(email)
+        User invitedUser = userRepository.findByEmail(inviteMemberRequest.getEmail())
                 .orElseThrow(() -> new EmailNotFoundException("해당 이메일의 유저가 존재하지 않습니다."));
 
         // 중복 초대 방지 (이미 해당 워크스페이스에 속한 멤버인지 확인)
         if(memberRepository.existsByUserAndWorkspace(invitedUser, member.getWorkspace())) {
-        throw new UserAlreadyMemberException("해당 유저는 이미 이 워크스페이스의 멤버입니다.");
+            throw new UserAlreadyMemberException("해당 유저는 이미 이 워크스페이스의 멤버입니다.");
         }
 
         // 새로운 멤버 생성 및 저장
-        Member newMember = new Member(invitedUser, member.getWorkspace(), memberRole);
+        Member newMember = new Member(invitedUser, member.getWorkspace(), inviteMemberRequest.getMemberRole());
         memberRepository.save(newMember);
 
     }
 
-
     // 워크스페이스 목록 조회
-    // * 유저가 멤버로 가입된 워크스페이스 목록을 볼 수 있습니다.
+    @Transactional
     public Page<GetWorkspaceResponse> getWorkspace(int page, int size, AuthUser authUser) {
         Pageable pageable = PageRequest.of(page-1, size);
         User user = User.fromAuthUser(authUser);
@@ -119,14 +119,13 @@ public class WorkspaceService {
         }
 
         workspace.updateWorkspace(workspaceRequest.getSpaceName(), workspaceRequest.getContent());
-        workspaceRepository.save(workspace);
         return new UpdateWorkspaceResponse(workspace.getSpaceId(), workspace.getSpaceName(), workspace.getContent());
 
     }
 
 
-    //  * 삭제 시 워크스페이스 내의 모든 보드와 데이터도 삭제됩니다.
     // 워크스페이스 삭제
+    @Transactional
     public void deleteWorkspace(AuthUser authUser, Long spaceId) {
         User user = User.fromAuthUser(authUser);
 
@@ -134,9 +133,8 @@ public class WorkspaceService {
                 .orElseThrow(() -> new  WorkspaceNotFoundException("해당 ID의 워크스페이스를 찾을 수 없습니다."));
 
         // 워크스페이스와 유저가 연결된 멤버 정보를 조회
-        Member member = memberService.memberInWorkspaceFetchWorkspace(authUser,spaceId );
-//        Member member = memberRepository.findByUserIdWithJoinFetchWorkspace(1L, 1L)
-//                .orElseThrow(() -> new UnauthorizedActionException("해당 워크스페이스에 대한 권한이 없습니다."));
+        Member member = memberRepository.findByUserAndWorkspace(user, workspace)
+                .orElseThrow(() -> new UnauthorizedActionException("해당 워크스페이스에 대한 권한이 없습니다."));
 
         // 유저가 워크스페이스를 수정할 권한이 없는 경우 (예: WORKSPACE_MEMBER 아닌 경우)
         if (member.getMemberRole() != MemberRole.WORKSPACE_MEMBER) {
@@ -148,3 +146,4 @@ public class WorkspaceService {
     }
 
 }
+
