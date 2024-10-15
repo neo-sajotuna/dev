@@ -187,8 +187,8 @@ public class CardService {
         cardRepository.delete(card);
     }
 
-    public Page<Card> searchCards(String cardTitle, String cardContent, String member, String finishedAt, Pageable pageable) {
-        return cardRepository.searchCards(cardTitle, cardContent, member, finishedAt, pageable);
+    public Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable) {
+        return cardRepository.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable);
 
     }
 }

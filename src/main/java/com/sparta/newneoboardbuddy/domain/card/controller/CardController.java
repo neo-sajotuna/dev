@@ -56,11 +56,11 @@ public class CardController {
     public ResponseEntity<Page<Card>> searchCards(
             @RequestParam(required = false) String cardTitle,
             @RequestParam(required = false) String cardContent,
-            @RequestParam(required = false) String member,
-            @RequestParam(required = false) String finishedAt,
+            @RequestParam(required = false) Long assignedMemberId,
+            @RequestParam(required = false) Long boardId,
             @PageableDefault(size=10, page=0) Pageable pageable
     ){
-        return ResponseEntity.ok(cardService.searchCards(cardTitle, cardContent, member, finishedAt, pageable));
+        return ResponseEntity.ok(cardService.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable));
     }
 
 }
