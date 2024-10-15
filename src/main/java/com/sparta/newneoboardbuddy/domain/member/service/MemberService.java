@@ -2,7 +2,6 @@ package com.sparta.newneoboardbuddy.domain.member.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
-import com.sparta.newneoboardbuddy.domain.member.dto.MemberResponse;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
@@ -45,5 +44,5 @@ public class MemberService {
 
         return memberRepository.findByUserIdWithJoinFetchWorkspace(user.getId(), workspaceId)
                 .orElseThrow(()->new NoSuchElementException("워크 스페이스에 가입된 정보가 없습니다."));
-}
+    }
 }
