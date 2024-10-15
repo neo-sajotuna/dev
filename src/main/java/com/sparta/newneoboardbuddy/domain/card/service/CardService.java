@@ -52,12 +52,8 @@ public class CardService {
     public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
         User user = User.fromUser(authUser);
 
+        // 혹시 모르니 이부분은 안바꾸겠습니다.
         Member member = memberService.memberPermission(authUser, request.getWorkspaceId());
-
-        // 읽기 전용 유저 생성 못하게 예외처리 해야함
-        if (member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
-            throw new InvalidRequestException("읽기 전용 멤버는 카드를 생성할 수 없습니다.");
-        }
 
         // 카드 추가될 리스트 조회
         BoardList list = boardListRepository.findById(listId).orElseThrow(() ->
