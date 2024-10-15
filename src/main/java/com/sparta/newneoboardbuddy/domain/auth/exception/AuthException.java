@@ -1,4 +1,4 @@
-package com.sparta.newneoboardbuddy.auth.exception;
+package com.sparta.newneoboardbuddy.domain.auth.exception;
 
 public class AuthException extends RuntimeException {
 

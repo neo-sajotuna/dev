@@ -1,4 +1,4 @@
-package com.sparta.newneoboardbuddy.auth.dto.response;
+package com.sparta.newneoboardbuddy.domain.auth.dto.response;
 
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 
