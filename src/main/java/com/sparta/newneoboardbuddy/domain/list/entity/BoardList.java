@@ -1,5 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.list.entity;
 
+import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
