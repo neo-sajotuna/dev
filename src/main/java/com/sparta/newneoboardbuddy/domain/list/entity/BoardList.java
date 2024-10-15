@@ -16,8 +16,8 @@ public class BoardList {
 
     private String title;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long index;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //private Long index;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)

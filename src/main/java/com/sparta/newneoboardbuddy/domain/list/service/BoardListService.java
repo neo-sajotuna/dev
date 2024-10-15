@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class BoardListService {
 
-    public BoardListResponse createList(AuthUser authUser, BoardListRequest boardListRequest) {
+//    public BoardListResponse createList(AuthUser authUser, BoardListRequest boardListRequest) {
+//
+//
+//    }
 
-
-    }
 }

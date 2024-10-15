@@ -15,6 +15,7 @@ import com.sparta.newneoboardbuddy.domain.cardActivityLog.enums.Action;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
@@ -110,7 +111,7 @@ public class CardService {
                 ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
 
 
-        return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActivatedAt());
+        return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActiveTime());
 
     }
 
