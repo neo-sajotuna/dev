@@ -5,8 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class CommentSaveRequestDto {
 
@@ -15,5 +18,7 @@ public class CommentSaveRequestDto {
 
     @NotBlank(message = "comment 값은 필수 파라미터 입니다.")
     private String comment;
+
+    private String emoji;
 
 }

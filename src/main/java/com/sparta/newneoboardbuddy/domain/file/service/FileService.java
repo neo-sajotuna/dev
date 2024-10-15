@@ -3,6 +3,7 @@ package com.sparta.newneoboardbuddy.domain.file.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.domain.file.dto.request.FileDeleteDto;
 import com.sparta.newneoboardbuddy.domain.file.dto.request.FileUploadDto;
 import com.sparta.newneoboardbuddy.domain.file.entity.S3File;
@@ -10,6 +11,7 @@ import com.sparta.newneoboardbuddy.domain.file.exception.FileSizeExceededExcepti
 import com.sparta.newneoboardbuddy.domain.file.exception.ImpossibilityExtensionException;
 import com.sparta.newneoboardbuddy.domain.file.exception.NotFoundFileException;
 import com.sparta.newneoboardbuddy.domain.file.repository.S3FileRepository;
+import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,7 +20,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,8 @@ public class FileService {
     private final AmazonS3 amazonS3Client;
 
     private final S3FileRepository s3FileRepository;
+
+    private final MemberService memberService;
 
     private String BASE_URL = "https://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/";
 
@@ -91,11 +97,11 @@ public class FileService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void deleteFile(FileDeleteDto fileDeleteDto) {
+    public void deleteFile(AuthUser authUser, FileDeleteDto fileDeleteDto) {
 
-        S3File s3File = s3FileRepository.findByTargetIdAndAndTargetTable(fileDeleteDto.getTargetId(), fileDeleteDto.getTargetTable()).orElseThrow(
-                () -> new NotFoundFileException(HttpStatus.BAD_REQUEST)
-        );
+        memberService.memberPermission(authUser, fileDeleteDto.getWorkspaceId());
+
+        S3File s3File = findS3File(fileDeleteDto.getTargetId(), fileDeleteDto.getTargetTable());
 
         try {
             // s3 파일 삭제
@@ -108,6 +114,18 @@ public class FileService {
             throw new RuntimeException("파일 삭제 중 알 수 없는 에러 발생");
         }
 
+    }
+
+    public String getFile(Long targetId, String targetTable) {
+        S3File s3File = findS3File(targetId, targetTable);
+        return s3File.getFileUrl();
+    }
+
+
+    private S3File findS3File(Long targetId, String targetTable) {
+        return s3FileRepository.findByTargetIdAndAndTargetTable(targetId, targetTable).orElseThrow(
+                () -> new NotFoundFileException(HttpStatus.BAD_REQUEST)
+        );
     }
 
     //원래 파일명에서 확장자 뽑기
