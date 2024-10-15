@@ -1,6 +1,5 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
@@ -15,6 +14,8 @@ import com.sparta.newneoboardbuddy.domain.cardActivityLog.entity.CardActivityLog
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.enums.Action;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
+import com.sparta.newneoboardbuddy.domain.file.dto.request.FileUploadDto;
+import com.sparta.newneoboardbuddy.domain.file.service.FileService;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -44,15 +46,10 @@ public class CardService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final CardActivityLogRepository cardActivityLogRepository;
+    private final FileService fileService;
 
-    // s3 DI
-    private final AmazonS3Client amazonS3Client;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
-
-    public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
+    @Transactional
+    public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request, MultipartFile file) {
         User user = User.fromUser(authUser);
 
         // 혹시 모르니 이부분은 안바꾸겠습니다.
@@ -76,6 +73,16 @@ public class CardService {
                 list
         );
         Card savedCard = cardRepository.save(newCard);
+
+        // 파일 저장 로직
+        FileUploadDto fileUploadDto = FileUploadDto.builder()
+                .targetId(savedCard.getCardId())
+                .targetTable("card")
+                .targetFile(file)
+                .build();
+
+        fileService.uploadFile(fileUploadDto);
+        // 파일 저장 로직
 
         logCardActivity(savedCard, Action.CREATED, "제목: " + savedCard.getCardTitle()  +
                 ", 내용 : " + savedCard.getCardContent() +

@@ -29,4 +29,6 @@ public class Comment extends Timestamped {
     // @Column(nullable = false)
     private String comment;
 
+    private String emoji;
+
 }
