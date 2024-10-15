@@ -1,4 +1,4 @@
-package com.sparta.newneoboardbuddy.auth.dto.request;
+package com.sparta.newneoboardbuddy.domain.auth.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SigninRequest {
-    private String email;
-    private String password;
+public class WithdrawRequest {
+    String password;
 }

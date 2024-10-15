@@ -1,6 +1,7 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
+import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardCreateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
@@ -16,16 +17,22 @@ import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.file.dto.request.FileUploadDto;
 import com.sparta.newneoboardbuddy.domain.file.service.FileService;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
+import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -34,7 +41,7 @@ import java.util.NoSuchElementException;
 @Transactional
 public class CardService {
 
-//    private final BoardListRepository boardListRepository;
+    private final BoardListRepository boardListRepository;
     private final CardRepository cardRepository;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
@@ -105,6 +112,14 @@ public class CardService {
         card.setCardTitle(request.getCardTitle());
         card.setCardContent(request.getCardContent());
 
+        Long workspaceId = card.getWorkspace().getSpaceId();
+        Member member = memberService.memberPermission(authUser, workspaceId);
+
+        // 읽기 전용 유저 생성 못하게 예외처리 해야함
+        if (member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
+            throw new InvalidRequestException("읽기 전용 멤버는 카드를 수정할 수 없습니다.");
+        }
+
         if(request.getMemberId() != null){
             Member assignedMember = memberRepository.findById(request.getMemberId())
                     .orElseThrow(()-> new NotFoundException("멤버가 없습니다."));
@@ -118,10 +133,11 @@ public class CardService {
                 ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
 
 
-        return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActivatedAt());
+        return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActiveTime());
 
     }
 
+    // 활동 로그 메서드
     private void logCardActivity(Card card, Action action, String details) {
         CardActivityLog activityLog = new CardActivityLog();
         activityLog.setCard(card);
@@ -152,5 +168,30 @@ public class CardService {
                 activityLogs,
                 comments
         );
+    }
+
+
+    public void deleteCard(Long cardId, AuthUser authUser) {
+        // 카드 조회
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(()-> new NotFoundException("카드 낫 파운드"));
+
+        Long workspaceId = card.getWorkspace().getSpaceId();
+
+        Member member = memberService.memberPermission(authUser, workspaceId);
+
+        // 읽기 전용 유저가 카드 삭제 시도시 예외 처리
+        if(member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
+            throw new InvalidRequestException("읽기 전용 멤버는 카드를 삭제할 수 없습니다.");
+        }
+
+
+
+        cardRepository.delete(card);
+    }
+
+    public Page<Card> searchCards(String cardTitle, String cardContent, String member, String finishedAt, Pageable pageable) {
+        return cardRepository.searchCards(cardTitle, cardContent, member, finishedAt, pageable);
+
     }
 }
