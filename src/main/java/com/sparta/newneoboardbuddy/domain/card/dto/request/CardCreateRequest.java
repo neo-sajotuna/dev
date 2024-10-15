@@ -14,4 +14,5 @@ public class CardCreateRequest {
     private String cardTitle;
     private String cardContent;
     private LocalTime finishedAt;
+    private Long assignedMemberId;
 }
