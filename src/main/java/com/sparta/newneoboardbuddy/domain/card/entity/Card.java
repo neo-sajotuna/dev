@@ -1,6 +1,7 @@
 package com.sparta.newneoboardbuddy.domain.card.entity;
 
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
+import com.sparta.newneoboardbuddy.domain.cardActivityLog.entity.CardActivityLog;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
@@ -64,6 +65,9 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
+
+//    @OneToMany(mappedBy = "CardActivityLog", cascade = CascadeType.PERSIST)
+//    private List<CardActivityLog> cardActivityLogs = new ArrayList<>();
 
     public Card(String cardTitle, String cardContent, LocalTime startedAt, LocalTime finishedAt, Member member, User user, BoardList list) {
         this.cardTitle = cardTitle;
