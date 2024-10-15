@@ -39,4 +39,11 @@ public class MemberService {
 
         return member;
     }
+
+    public Member memberInWorkspaceFetchWorkspace(AuthUser authUser, Long workspaceId) {
+        User user = User.fromUser(authUser);
+
+        return memberRepository.findByUserIdWithJoinFetchWorkspace(user.getId(), workspaceId)
+                .orElseThrow(()->new NoSuchElementException("워크 스페이스에 가입된 정보가 없습니다."));
+}
 }
