@@ -3,13 +3,13 @@ package com.sparta.newneoboardbuddy.domain.card.entity;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -47,18 +47,22 @@ public class Card {
     private Workspace workspace;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name= "board", nullable = false)
+    @JoinColumn(name= "board_id", nullable = false)
     private Board board;
 
     @ManyToOne(fetch =FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Card(String cardTitle, String cardContent, LocalTime finishedAt, User user, BoardList list) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id",nullable = false)
+    private Member member;
+
+    public Card(String cardTitle, String cardContent, LocalTime finishedAt, Member member, User user, BoardList list) {
         this.cardTitle = cardTitle;
         this.cardContent = cardContent;
         this.finishedAt = finishedAt;
-//        this.member = member;
+        this.member = member;
         this.user = user;
         this.boardList = list;
 
