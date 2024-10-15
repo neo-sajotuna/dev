@@ -18,10 +18,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
 
-    public void memberPermission(AuthUser authUser, Long userId, Long workspaceId) {
+    public Member memberPermission(AuthUser authUser, Long userId, Long workspaceId) {
         User user = User.fromUser(authUser);
 
-        Member member = memberRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
+        return memberRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
                 .orElseThrow(() -> new NoSuchElementException("Member not found"));
     }
 }

@@ -7,6 +7,7 @@ import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
@@ -19,27 +20,31 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class CardService {
 
-//    private final BoardListRepository boardListRepository;
+    private final BoardListRepository boardListRepository;
     private final CardRepository cardRepository;
     private final MemberService memberService;
 
     public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
         User user = User.fromUser(authUser);
 
-         memberService.memberPermission(authUser, user.getId(), request.getWorkspaceId());
+        Member member = memberService.memberPermission(authUser, user.getId(), request.getWorkspaceId());
 
-        // 읽기 전용 유저 생성 못하게 예외처리
+        // 읽기 전용 유저 생성 못하게 예외처리 해야함
+        if (member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
+            throw new InvalidRequestException("읽기 전용 멤버는 카드를 생성할 수 없습니다.");
+        }
 
-//        BoardList list = boardListRepository.findById(listId).orElseThrow(() ->
-//                new InvalidRequestException("list not found"));
+        // 카드 추가될 리스트 조회
+        BoardList list = boardListRepository.findById(listId).orElseThrow(() ->
+                new InvalidRequestException("list not found"));
 
-        BoardList list = null;
+        // 담당자 멤버 ID 를 받아서 조회
 
         Card newCard = new Card(
                 request.getCardTitle(),
                 request.getCardContent(),
                 request.getFinishedAt(),
-//                request.getMember(),  얘 어떡할건데
+                member,
                 user,
                 list
         );
@@ -49,8 +54,12 @@ public class CardService {
                 savedCard.getCardId(),
                 savedCard.getCardTitle(),
                 savedCard.getCardContent(),
-                savedCard.getFinishedAt()
+                savedCard.getFinishedAt(),
+                savedCard.getMember()
         );
 
     }
+
+
+
 }

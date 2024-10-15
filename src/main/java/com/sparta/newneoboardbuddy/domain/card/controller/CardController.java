@@ -25,4 +25,5 @@ public class CardController {
         return ResponseEntity.ok(cardService.createCard(listId ,authUser, request));
     }
 
+
 }
