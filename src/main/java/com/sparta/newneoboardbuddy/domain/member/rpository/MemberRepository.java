@@ -11,14 +11,15 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
+    @Query("select m from Member m " +
+            "where m.memberId = :userId AND m.workspace.spaceId = :workspaceId")
+    Optional<Member> findByUserIdWithJoinFetchWorkspace(Long userId, Long workspaceId);
+
     Optional<Member> findByUserAndWorkspace(User user, Workspace workspace);
+
 
     boolean existsByUserAndWorkspace(User user, Workspace workspace);
 
     Page<Member> findAllByUser(User user, Pageable pageable);
-
-    @Query("select m from Member m join fetch m.workspace w  " +
-            "where m.memberId = :userId AND m.workspace.spaceId = :workspaceId")
-    Optional<Member> findByUserIdWithJoinFetchWorkspace(Long userId, Long workspaceId);
 
 }
