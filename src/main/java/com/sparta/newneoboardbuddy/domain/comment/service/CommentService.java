@@ -2,6 +2,7 @@ package com.sparta.newneoboardbuddy.domain.comment.service;
 
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
+import com.sparta.newneoboardbuddy.config.SlackNotificationUtil;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.exception.CardNotFoundException;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
@@ -34,6 +35,8 @@ public class CommentService {
 
     private final MemberService memberService;
 
+    private final SlackNotificationUtil slackNotificationUtil;
+
     @Transactional
     public CommentSaveResponseDto saveComment(AuthUser authUser, CommentSaveRequestDto commentSaveRequestDto) {
 
@@ -58,6 +61,9 @@ public class CommentService {
         try {
             // 댓글 저장
             Comment newComment = commentRepository.save(comment);
+
+            // Slack 알림 발송
+            slackNotificationUtil.sendNewComment(newComment, user);
 
             // 저장된 댓글을 response 로 변환
             return CommentSaveResponseDto.builder()
