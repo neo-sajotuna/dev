@@ -1,4 +1,4 @@
-package com.sparta.newneoboardbuddy.auth.dto.response;
+package com.sparta.newneoboardbuddy.domain.auth.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
