@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-public class CommentSaveResponseDto {
+public class CommentUpdateResponseDto {
 
     private final Long commentId;
 
     private final String comment;
 
-    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
 }
