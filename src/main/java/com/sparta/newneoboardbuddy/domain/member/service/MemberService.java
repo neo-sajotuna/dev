@@ -1,8 +1,10 @@
 package com.sparta.newneoboardbuddy.domain.member.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
+import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.domain.member.dto.MemberResponse;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
+import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
