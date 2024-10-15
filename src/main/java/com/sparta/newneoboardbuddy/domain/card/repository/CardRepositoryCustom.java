@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface CardRepositoryCustom {
 
-    Page<Card> searchCards(String cardTitle, String cardContent, String member, String finishedAt, Pageable pageable);
+    Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable);
 }
