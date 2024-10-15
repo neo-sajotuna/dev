@@ -52,6 +52,7 @@ public class CommentService {
                 .card(card)
                 .user(user)
                 .comment(commentSaveRequestDto.getComment())
+                .emoji(commentSaveRequestDto.getEmoji())
                 .build();
 
         try {
@@ -62,6 +63,7 @@ public class CommentService {
             return CommentSaveResponseDto.builder()
                     .commentId(newComment.getCommentId())
                     .comment(newComment.getComment())
+                    .emoji(newComment.getEmoji())
                     .createdAt(newComment.getCreatedAt())
                     .build();
 
@@ -84,12 +86,19 @@ public class CommentService {
         checkWriter(authUser.getId(), comment.getUser().getId());
 
         // 업데이트
-        comment.setComment(commentUpdateRequestDto.getComment());
+        if (commentUpdateRequestDto.getComment() != null && !commentUpdateRequestDto.getComment().trim().isEmpty()) {
+            comment.setComment(commentUpdateRequestDto.getComment());
+        }
+
+        if (commentUpdateRequestDto.getEmoji() != null && !commentUpdateRequestDto.getEmoji().trim().isEmpty()) {
+            comment.setEmoji(commentUpdateRequestDto.getEmoji());
+        }
 
         // 업데이트 된 comment 객체 response 로 변환
         return CommentUpdateResponseDto.builder()
                 .commentId(comment.getCommentId())
                 .comment(comment.getComment())
+                .emoji(comment.getEmoji())
                 .updatedAt(comment.getModifiedAt())
                 .build();
 
