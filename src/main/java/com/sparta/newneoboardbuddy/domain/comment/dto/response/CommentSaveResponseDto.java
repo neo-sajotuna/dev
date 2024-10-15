@@ -14,5 +14,7 @@ public class CommentSaveResponseDto {
 
     private final String comment;
 
+    private final String emoji;
+
     private final LocalDateTime createdAt;
 }
