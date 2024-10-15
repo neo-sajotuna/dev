@@ -6,12 +6,14 @@ import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardCreateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
+import com.sparta.newneoboardbuddy.domain.card.dto.response.CardDetailResponse;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardUpdateResponse;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.entity.CardActivityLog;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.enums.Action;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
+import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -40,7 +43,7 @@ public class CardService {
     public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
         User user = User.fromUser(authUser);
 
-        Member member = memberService.memberPermission(authUser, user.getId(), request.getWorkspaceId());
+        Member member = memberService.memberPermission(authUser, request.getWorkspaceId());
 
         // 읽기 전용 유저 생성 못하게 예외처리 해야함
         if (member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
@@ -119,5 +122,27 @@ public class CardService {
         activityLog.setActiveTime(LocalDateTime.now());
 
         cardActivityLogRepository.save(activityLog);
+    }
+
+//    @Transactional(readOnly = true)
+    public CardDetailResponse getCardDetails(Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(()-> new NotFoundException("카드가 없다."));
+
+        // 카드 활동 내역 조회
+        List<CardActivityLog> activityLogs = cardActivityLogRepository.findByCard(card);
+
+        // 카드 댓글 조회
+        List<Comment> comments = card.getComments();
+
+        return new CardDetailResponse(
+                card.getCardId(),
+                card.getCardTitle(),
+                card.getCardContent(),
+                card.getStartedAt(),
+                card.getFinishedAt(),
+                activityLogs,
+                comments
+        );
     }
 }
