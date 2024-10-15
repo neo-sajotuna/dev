@@ -4,6 +4,7 @@ import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.auth.exception.AuthException;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
+import com.sparta.newneoboardbuddy.domain.board.service.BoardService;
 import com.sparta.newneoboardbuddy.domain.list.dto.request.BoardListDeleteRequest;
 import com.sparta.newneoboardbuddy.domain.list.dto.request.BoardListRequest;
 import com.sparta.newneoboardbuddy.domain.list.dto.request.BoardListUpdateRequest;
@@ -14,6 +15,7 @@ import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
+import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +28,7 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class BoardListService {
 
+    private final BoardService boardService;
     private final MemberService memberService;
     private final WorkspaceService workspaceService;
     private final BoardListRepository boardListRepository;
@@ -35,7 +38,7 @@ public class BoardListService {
     public BoardListResponse createList(AuthUser authUser, BoardListRequest boardListRequest) {
         // 해당 유저가 워크스페이스 유저인지 확인
         Member member = getMemberInWorkspace(authUser, boardListRequest.getWorkspaceId());
-        Board board = hierarchyUtil.getBoardListUseMember(member, boardListRequest.getBoardId());
+        Board board = boardService.getBoardFetchJoinToWorkspace(boardListRequest.getBoardId());
 
         BoardList boardList = new BoardList(
                 0L,
@@ -51,8 +54,7 @@ public class BoardListService {
     public BoardListResponse updateList(AuthUser authUser, Long listId, BoardListUpdateRequest boardListUpdateRequest) {
         // 해당 유저가 워크스페이스 유저인지 확인
         Member member = getMemberInWorkspace(authUser, boardListUpdateRequest.getWorkspaceId());
-        BoardList findBoardList = boardListRepository.findById(listId)
-                .orElseThrow(()-> new NoSuchElementException("존재하지 않는 List입니다."));
+        BoardList findBoardList = getBoardListInWorkspace(listId, boardListUpdateRequest.getWorkspaceId());
 
         if (!findBoardList.getListIndex().equals(boardListUpdateRequest.getIndex())) {
            BoardList findOtherList = boardListRepository.findByBoardAndListIndex(findBoardList.getBoard(), boardListUpdateRequest.getIndex())
@@ -66,10 +68,13 @@ public class BoardListService {
         return new BoardListResponse(boardListRepository.save(findBoardList));
     }
 
+    @Transactional
     public BoardListDeleteResponse deleteList(AuthUser authUser, Long listId, BoardListDeleteRequest boardListDeleteRequest) {
         Member member = memberService.memberInWorkspaceFetchWorkspace(authUser, boardListDeleteRequest.getWorkspaceId());
+        BoardList boardList = getBoardListInWorkspace(listId, boardListDeleteRequest.getWorkspaceId());
 
-        return null;
+        boardListRepository.delete(boardList);
+        return new BoardListDeleteResponse(listId);
     }
 
     private Member getMemberInWorkspace(AuthUser authUser, Long workspaceId) {
@@ -82,10 +87,46 @@ public class BoardListService {
         return member;
     }
 
+    /**
+     * 두 BoardList의 인덱스를 교체하는 메서드
+     * @param a 바꿀 객체 A
+     * @param b 상대 객체 B
+     */
     private void swapIndices(BoardList a, BoardList b) {
         Long tmp = a.getListIndex();
 
         a.swapIndex(b.getListIndex());
         b.swapIndex(tmp);
     }
+
+    /**
+     * 해당 BoardList가 Workspace에 속할 경우 반환하는 메서드
+     * @param boardlistId 찾고자 하는 BoardList
+     * @param workspaceId 속하는지 확인할 workspace Id
+     * @return Workspace에 속하고 있는 boardList 객체
+     */
+    private BoardList getBoardListInWorkspace(Long boardlistId, Long workspaceId) {
+        BoardList boardList = boardListRepository.findByIdWithJoinFetchToWorkspace(boardlistId)
+                .orElseThrow(()-> new NoSuchElementException("존재하지 않는 List입니다."));
+
+        if (isBoardListInWorkspace(boardList, workspaceId)) {
+            throw new IllegalArgumentException("Workspace에 존재하지 않는 List입니다");
+        }
+
+        return boardList;
+    }
+
+    /**
+     * 해당 BoardList가 workspace에 속하는지 확인하는 메서드
+     * @param boardList 확인할 BoardList 객체
+     * @param workspaceId 속하는지 확인할 workspace Id
+     * @return True : BoardList는 Workspace에 속함 / False : BoardList는 다른 Workspace소속
+     */
+    private boolean isBoardListInWorkspace(BoardList boardList, Long workspaceId) {
+        Board board = boardList.getBoard();
+        Workspace workspace = board.getWorkspace();
+
+        return !workspace.getSpaceId().equals(workspaceId);
+    }
+
 }
