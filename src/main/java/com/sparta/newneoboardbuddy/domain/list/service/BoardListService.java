@@ -30,7 +30,7 @@ public class BoardListService {
     public BoardListResponse createList(AuthUser authUser, BoardListRequest boardListRequest) {
         // 해당 유저가 워크스페이스 유저인지 확인
         Member member = memberService.memberInWorkspaceFetchWorkspace(authUser, boardListRequest.getWorkspaceId());
-     
+
         if (member.getMemberRole().equals(MemberRole.READ_ONLY_MEMBER)) {
             throw new AuthException("해당 유저는 쓰기 권한이 없습니다.");
         }
