@@ -1,12 +1,12 @@
-package com.sparta.newneoboardbuddy.auth.controller;
+package com.sparta.newneoboardbuddy.domain.auth.controller;
 
-import com.sparta.newneoboardbuddy.auth.dto.request.SigninRequest;
-import com.sparta.newneoboardbuddy.auth.dto.request.SignupRequest;
-import com.sparta.newneoboardbuddy.auth.dto.request.WithdrawRequest;
-import com.sparta.newneoboardbuddy.auth.dto.response.SigninResponse;
-import com.sparta.newneoboardbuddy.auth.dto.response.SignupResponse;
-import com.sparta.newneoboardbuddy.auth.dto.response.WithdrawResponse;
-import com.sparta.newneoboardbuddy.auth.service.AuthService;
+import com.sparta.newneoboardbuddy.domain.auth.dto.request.SigninRequest;
+import com.sparta.newneoboardbuddy.domain.auth.dto.request.SignupRequest;
+import com.sparta.newneoboardbuddy.domain.auth.dto.request.WithdrawRequest;
+import com.sparta.newneoboardbuddy.domain.auth.dto.response.SigninResponse;
+import com.sparta.newneoboardbuddy.domain.auth.dto.response.SignupResponse;
+import com.sparta.newneoboardbuddy.domain.auth.dto.response.WithdrawResponse;
+import com.sparta.newneoboardbuddy.domain.auth.service.AuthService;
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
