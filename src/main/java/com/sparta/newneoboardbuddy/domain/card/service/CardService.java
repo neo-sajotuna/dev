@@ -1,5 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
@@ -22,6 +23,7 @@ import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,11 +36,18 @@ import java.util.NoSuchElementException;
 @Transactional
 public class CardService {
 
-    private final BoardListRepository boardListRepository;
+//    private final BoardListRepository boardListRepository;
     private final CardRepository cardRepository;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final CardActivityLogRepository cardActivityLogRepository;
+
+    // s3 DI
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+
 
     public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
         User user = User.fromUser(authUser);
