@@ -4,15 +4,15 @@ import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class CardCreateResponse {
+public class CardUpdateResponse {
     private final Long cardId;
     private final String cardTitle;
     private final String cardContent;
-    private final LocalTime startedAt;
-    private final LocalTime finishedAt;
     private final Long memberId;
+    private final LocalDateTime activeTime;
+
 }
