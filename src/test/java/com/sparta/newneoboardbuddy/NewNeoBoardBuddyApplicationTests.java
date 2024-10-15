@@ -13,17 +13,17 @@ import java.io.IOException;
 @SpringBootTest
 class NewNeoBoardBuddyApplicationTests {
 
-//    @Autowired
-//    SlackNotificationUtil slackNotificationUtil;
-//
-//    @Test
-//    void contextLoads() throws IOException {
-//        User user = new User();
-//        ReflectionTestUtils.setField(user, "id", 0L);
-//        ReflectionTestUtils.setField(user, "email", "test@a.com");
-//        ReflectionTestUtils.setField(user, "userRole", UserRole.ROLE_ADMIN);
-//
-//        slackNotificationUtil.sendNewUser(user);
-//    }
+    @Autowired
+    SlackNotificationUtil slackNotificationUtil;
+
+    @Test
+    void contextLoads() throws IOException {
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", 0L);
+        ReflectionTestUtils.setField(user, "email", "test@a.com");
+        ReflectionTestUtils.setField(user, "userRole", UserRole.ROLE_ADMIN);
+
+        slackNotificationUtil.sendNewUser(user);
+    }
 
 }

@@ -104,7 +104,7 @@ public class WorkspaceService {
     // 워크스페이스 수정
     @Transactional
     public UpdateWorkspaceResponse updateWorkspace(AuthUser authUser, Long spaceId, WorkspaceRequest workspaceRequest) {
-        User user = User.fromAuthUser(authUser);
+        User user = User.fromUser(authUser);
 
         Workspace workspace = workspaceRepository.findById(spaceId)
                 .orElseThrow(() -> new  WorkspaceNotFoundException("해당 ID의 워크스페이스를 찾을 수 없습니다."));
@@ -127,7 +127,7 @@ public class WorkspaceService {
     // 워크스페이스 삭제
     @Transactional
     public void deleteWorkspace(AuthUser authUser, Long spaceId) {
-        User user = User.fromAuthUser(authUser);
+        User user = User.fromUser(authUser);
 
         Workspace workspace = workspaceRepository.findById(spaceId)
                 .orElseThrow(() -> new  WorkspaceNotFoundException("해당 ID의 워크스페이스를 찾을 수 없습니다."));

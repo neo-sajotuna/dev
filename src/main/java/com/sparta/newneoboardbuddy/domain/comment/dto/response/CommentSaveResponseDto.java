@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class CommentSaveResponseDto {
-
     private final Long commentId;
 
     private final String comment;
@@ -18,5 +17,4 @@ public class CommentSaveResponseDto {
     private final String emoji;
 
     private final LocalDateTime createdAt;
-
 }
