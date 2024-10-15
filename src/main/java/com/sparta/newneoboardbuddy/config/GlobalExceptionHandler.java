@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CommonException.class)
     public ResponseEntity<Map<String, Object>> CommonException(CommonException e) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        HttpStatus status = e.getStatus();
         return getErrorResponse(status, e.getMessage());
     }
 
@@ -45,6 +45,13 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.NOT_FOUND;
         return getErrorResponse(status, ex.getMessage());
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return getErrorResponse(status, ex.getMessage());
+    }
+
 
     public ResponseEntity<Map<String, Object>> getErrorResponse(HttpStatus status, String message) {
         Map<String, Object> errorResponse = new HashMap<>();
