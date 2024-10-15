@@ -29,6 +29,12 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MemberRole memberRole; // WORKSPACE_ADMIN, BOARD_MEMBER, READ_ONLY_MEMBER
+    private MemberRole memberRole; // WORKSPACE_MEMBER, BOARD_MEMBER, READ_ONLY_MEMBER
 
+    // User, Workspace, MemberRole 을 받아서 Member 생성
+    public Member(User user, Workspace workspace, MemberRole memberRole) {
+        this.user = user;
+        this.workspace = workspace;
+        this.memberRole = memberRole;
+    }
 }
