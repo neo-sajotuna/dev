@@ -11,12 +11,16 @@ import com.sparta.newneoboardbuddy.domain.comment.dto.response.CommentSaveRespon
 import com.sparta.newneoboardbuddy.domain.comment.dto.response.CommentUpdateResponseDto;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.comment.exception.CommentNotFoundException;
+import com.sparta.newneoboardbuddy.domain.comment.exception.NotAuthorException;
 import com.sparta.newneoboardbuddy.domain.comment.repository.CommentRepository;
+import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 import static com.sparta.newneoboardbuddy.domain.user.entity.User.fromAuthUser;
 
@@ -28,11 +32,16 @@ public class CommentService {
 
     private final CardRepository cardRepository;
 
+    private final MemberService memberService;
+
     @Transactional
     public CommentSaveResponseDto saveComment(AuthUser authUser, CommentSaveRequestDto commentSaveRequestDto) {
 
         // 카드 유효성 검사
         Card card = getCardById(commentSaveRequestDto.getCardId());
+
+        // 권한 체크
+        memberService.memberPermission(authUser, card.getWorkspace().getSpaceId());
 
         // 유저 엔티티 변환
         User user = fromAuthUser(authUser);
@@ -63,10 +72,16 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentUpdateResponseDto updateComment(Long commentId, CommentUpdateRequestDto commentUpdateRequestDto) {
+    public CommentUpdateResponseDto updateComment(AuthUser authUser, Long commentId, CommentUpdateRequestDto commentUpdateRequestDto) {
 
         // comment 객체 생성
         Comment comment = getCommentById(commentId);
+
+        // 권한 체크
+        memberService.memberPermission(authUser, comment.getCard().getWorkspace().getSpaceId());
+
+        // 자기가 작성한 글을 수정하는지 확인
+        checkWriter(authUser.getId(), comment.getUser().getId());
 
         // 업데이트
         comment.setComment(commentUpdateRequestDto.getComment());
@@ -81,10 +96,16 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long commentId) {
+    public void deleteComment(AuthUser authUser, Long commentId) {
 
         // comment 객체 생성
         Comment comment = getCommentById(commentId);
+
+        // 권한 체크
+        memberService.memberPermission(authUser, comment.getCard().getWorkspace().getSpaceId());
+
+        // 자기가 작성한 글을 수정하는지 확인
+        checkWriter(authUser.getId(), comment.getUser().getId());
 
         try {
             // comment 삭제
@@ -104,7 +125,14 @@ public class CommentService {
     // cardId 로 card 가 있는지 확인
     private Card getCardById(Long cardId){
         return cardRepository.findByCardId(cardId).orElseThrow(
-                () -> new CommentNotFoundException(HttpStatus.BAD_REQUEST)
+                () -> new CardNotFoundException(HttpStatus.BAD_REQUEST)
         );
+    }
+
+    // 자기가 쓴글을 수정하려는지 확인
+    private void checkWriter(Long authUserId, Long userId){
+        if(!authUserId.equals(userId)){
+            throw new NotAuthorException(HttpStatus.BAD_REQUEST);
+        }
     }
 }

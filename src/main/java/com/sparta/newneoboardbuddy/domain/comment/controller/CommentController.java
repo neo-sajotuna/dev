@@ -26,15 +26,15 @@ public class CommentController {
     }
 
     @PatchMapping("/{commentId}")
-    public CommonResponseDto<?> saveComment(@PathVariable("commentId") Long commentId, @Valid @RequestBody CommentUpdateRequestDto commentUpdateRequestDto){
+    public CommonResponseDto<?> saveComment(@AuthenticationPrincipal AuthUser authUser, @PathVariable("commentId") Long commentId, @Valid @RequestBody CommentUpdateRequestDto commentUpdateRequestDto){
         return CommonResponseDto.success(
-                commentService.updateComment(commentId, commentUpdateRequestDto)
+                commentService.updateComment(authUser, commentId, commentUpdateRequestDto)
         );
     }
 
     @DeleteMapping("/{commentId}")
-    public CommonResponseDto<?> saveComment(@PathVariable("commentId") Long commentId){
-        commentService.deleteComment(commentId);
+    public CommonResponseDto<?> saveComment(@AuthenticationPrincipal AuthUser authUser, @PathVariable("commentId") Long commentId){
+        commentService.deleteComment(authUser, commentId);
         return CommonResponseDto.success(null);
     }
 }
