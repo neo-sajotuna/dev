@@ -21,7 +21,7 @@ public class MemberService {
     public void memberPermission(AuthUser authUser, Long userId, Long workspaceId) {
         User user = User.fromUser(authUser);
 
-        Member member = memberRepository.findByUserIdAndSpaceId(userId, workspaceId)
+        Member member = memberRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
                 .orElseThrow(() -> new NoSuchElementException("Member not found"));
     }
 }
