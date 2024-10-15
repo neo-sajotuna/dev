@@ -40,6 +40,10 @@ public class BoardListService {
         Member member = getMemberInWorkspace(authUser, boardListRequest.getWorkspaceId());
         Board board = boardService.getBoardFetchJoinToWorkspace(boardListRequest.getBoardId());
 
+        if (!hierarchyUtil.isBoardInWorkspace(boardListRequest.getWorkspaceId(), board)) {
+            throw new IllegalArgumentException("Workspace에 존재하지 않는 Board입니다");
+        }
+
         BoardList boardList = new BoardList(
                 0L,
                 boardListRequest.getTitle(),
@@ -109,24 +113,10 @@ public class BoardListService {
         BoardList boardList = boardListRepository.findByIdWithJoinFetchToWorkspace(boardlistId)
                 .orElseThrow(()-> new NoSuchElementException("존재하지 않는 List입니다."));
 
-        if (isBoardListInWorkspace(boardList, workspaceId)) {
+        if (hierarchyUtil.isListInWorkspace(workspaceId, boardList)) {
             throw new IllegalArgumentException("Workspace에 존재하지 않는 List입니다");
         }
 
         return boardList;
     }
-
-    /**
-     * 해당 BoardList가 workspace에 속하는지 확인하는 메서드
-     * @param boardList 확인할 BoardList 객체
-     * @param workspaceId 속하는지 확인할 workspace Id
-     * @return True : BoardList는 Workspace에 속함 / False : BoardList는 다른 Workspace소속
-     */
-    private boolean isBoardListInWorkspace(BoardList boardList, Long workspaceId) {
-        Board board = boardList.getBoard();
-        Workspace workspace = board.getWorkspace();
-
-        return !workspace.getSpaceId().equals(workspaceId);
-    }
-
 }
