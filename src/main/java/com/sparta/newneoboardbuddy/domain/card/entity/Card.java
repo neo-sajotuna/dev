@@ -66,9 +66,6 @@ public class Card {
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
-//    @OneToMany(mappedBy = "CardActivityLog", cascade = CascadeType.PERSIST)
-//    private List<CardActivityLog> cardActivityLogs = new ArrayList<>();
-
     public Card(String cardTitle, String cardContent, LocalTime startedAt, LocalTime finishedAt, Member member, User user, BoardList list) {
         this.cardTitle = cardTitle;
         this.cardContent = cardContent;
