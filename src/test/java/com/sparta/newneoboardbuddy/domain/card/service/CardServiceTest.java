@@ -32,6 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.mock.web.MockMultipartFile;
@@ -70,7 +71,6 @@ class CardServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
     void setUp(){
         Card card = new Card();
         card.setCardTitle("Old Title");
@@ -114,7 +114,6 @@ class CardServiceTest {
 
 
     @Test
-    @Transactional
     void updateCard_낙관적_락_적용() throws InterruptedException {
         // given
         AuthUser authUser = new AuthUser(1L, "gusrnr5153@naver.com", UserRole.ROLE_ADMIN);
@@ -145,8 +144,7 @@ class CardServiceTest {
         list.setBoard(board);
         boardListRepository.save(list);
 
-
-        //  BoardList list = boardListRepository.findByIdWithJoinFetchToWorkspace(listId).orElseThrow(()->new InvalidRequestException("list not found"));
+//        boardListRepository.findByIdWithJoinFetchToWorkspace(list.getListId()).orElseThrow(()->new InvalidRequestException("list not found"));
 
 
         CardCreateRequest cardCreateRequest = new CardCreateRequest(list.getBoard().getWorkspace().getSpaceId(), list.getBoard().getBoardId(),"dkdk", "아아아", LocalTime.now().plusHours(10), LocalTime.now().plusHours(20),member.getMemberId(), file);
@@ -163,6 +161,7 @@ class CardServiceTest {
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < threadCount; i++) {
+            System.out.println(i);
             executorService.submit(() -> {
                 try {
                     CardUpdateRequest request = new CardUpdateRequest(workspace.getSpaceId(),"new title","new content", member.getMemberId(), LocalTime.now());
@@ -185,13 +184,15 @@ class CardServiceTest {
          // 모든 작업이 완료될 때까지 대기
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        int finalCount = cardRepository.findByIdWithJoinFetchToWorkspace(cardId).orElseThrow(()-> new IllegalArgumentException("card not found")).getCount();
+        int finalCount = cardRepository.findByCardId(cardId).orElseThrow(()-> new IllegalArgumentException("card not found")).getCount();
         int testedTotalCount = optimisticLockExceptionCount.get() + finalCount;
 
         assertTrue(optimisticLockExceptionCount.get() > 0);
         System.out.println("낙관적 락 실행 시간: " + duration + "ms");
         System.out.println("발생한 예외 수:" + optimisticLockExceptionCount.get());
         System.out.println("요청 수: " + threadCount + ", " + "테스트한 토탈 카운트: " + testedTotalCount);
+        System.out.println(optimisticLockExceptionCount.get());
+        System.out.println(finalCount);
     }
 
     @Test

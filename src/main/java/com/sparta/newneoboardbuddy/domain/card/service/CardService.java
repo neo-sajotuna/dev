@@ -1,13 +1,11 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.common.exception.CommonOptimisticLockingFailureException;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
 import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.board.exception.BoardNotFoundException;
-import com.sparta.newneoboardbuddy.domain.board.repository.BoardRepository;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardCreateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
@@ -20,7 +18,6 @@ import com.sparta.newneoboardbuddy.domain.cardActivityLog.enums.Action;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.file.dto.request.FileUploadDto;
-import com.sparta.newneoboardbuddy.domain.file.exception.NotFoundFileException;
 import com.sparta.newneoboardbuddy.domain.file.service.FileService;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
@@ -33,18 +30,13 @@ import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +59,7 @@ public class CardService {
         User user = User.fromUser(authUser);
 
         // 혹시 모르니 이부분은 안바꾸겠습니다.
-        Member member = memberService.memberPermission(authUser, request.getWorkspaceId());
+        Member member = memberService.verifyMember(authUser, request.getWorkspaceId());
         System.out.println("member = " + member);
 
         // 카드 추가될 리스트 조회
@@ -105,16 +97,16 @@ public class CardService {
         Card savedCard = cardRepository.save(newCard);
 
         // 파일 저장 로직
-        if (request.getFile() != null || !request.getFile().isEmpty()) {
-            FileUploadDto fileUploadDto = FileUploadDto.builder()
-                    .targetId(savedCard.getCardId())
-                    .targetTable("card")
-                    .targetFile(request.getFile())
-                    .build();
+//        if (request.getFile() != null || !request.getFile().isEmpty()) {
+//            FileUploadDto fileUploadDto = FileUploadDto.builder()
+//                    .targetId(savedCard.getCardId())
+//                    .targetTable("card")
+//                    .targetFile(request.getFile())
+//                    .build();
 
-            fileService.uploadFile(fileUploadDto);
+//            fileService.uploadFile(fileUploadDto);
             // 파일 저장 로직
-        }
+//        }
 
 
         logCardActivity(savedCard, Action.CREATED, "제목: " + savedCard.getCardTitle()  +
@@ -155,7 +147,7 @@ public class CardService {
         card.setCardContent(request.getCardContent());
 
         Long workspaceId = card.getWorkspace().getSpaceId();
-        Member member = memberService.memberPermission(authUser, workspaceId);
+        Member member = memberService.verifyMember(authUser, workspaceId);
 
         // 읽기 전용 유저 생성 못하게 예외처리 해야함
         if (member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
@@ -231,7 +223,7 @@ public class CardService {
 
         Long workspaceId = card.getWorkspace().getSpaceId();
 
-        Member member = memberService.memberPermission(authUser, workspaceId);
+        Member member = memberService.verifyMember(authUser, workspaceId);
 
         // workspace에 해당 List가 속해 있는지 확인
         if (!hierarchyUtil.isCardInWorkspace(workspaceId, card)) {
