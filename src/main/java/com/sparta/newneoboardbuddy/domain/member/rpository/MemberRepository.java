@@ -18,7 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Page<Member> findAllByUser(User user, Pageable pageable);
 
     @Query("select m from Member m join fetch m.workspace w  " +
-            "where m.memberId = :userId AND m.workspace.spaceId = :workspaceId")
+            "where m.user.id = :userId AND m.workspace.spaceId = :workspaceId")
     Optional<Member> findByUserIdWithJoinFetchWorkspace(Long userId, Long workspaceId);
 
 }

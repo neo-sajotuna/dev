@@ -69,7 +69,7 @@ public class Card {
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
-    public Card(String cardTitle, String cardContent, LocalTime startedAt, LocalTime finishedAt, Member member, User user, BoardList list) {
+    public Card(String cardTitle, String cardContent, LocalTime startedAt, LocalTime finishedAt, Member member, User user, BoardList list, Board board, Workspace workspace) {
         this.cardTitle = cardTitle;
         this.cardContent = cardContent;
         this.startedAt = startedAt;
@@ -77,6 +77,8 @@ public class Card {
         this.member = member;
         this.user = user;
         this.boardList = list;
+        this.board = board;
+        this.workspace = workspace;
     }
 
 }

@@ -4,6 +4,9 @@ import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
 import com.sparta.newneoboardbuddy.config.HierarchyUtil;
+import com.sparta.newneoboardbuddy.domain.board.entity.Board;
+import com.sparta.newneoboardbuddy.domain.board.exception.BoardNotFoundException;
+import com.sparta.newneoboardbuddy.domain.board.repository.BoardRepository;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardCreateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
@@ -16,6 +19,7 @@ import com.sparta.newneoboardbuddy.domain.cardActivityLog.enums.Action;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.file.dto.request.FileUploadDto;
+import com.sparta.newneoboardbuddy.domain.file.exception.NotFoundFileException;
 import com.sparta.newneoboardbuddy.domain.file.service.FileService;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
@@ -25,6 +29,8 @@ import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 
+import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
+import com.sparta.newneoboardbuddy.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
@@ -32,6 +38,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,10 +57,12 @@ public class CardService {
     private final CardActivityLogRepository cardActivityLogRepository;
     private final FileService fileService;
 
+    private final WorkspaceRepository workspaceRepository;
+
     private final HierarchyUtil hierarchyUtil;
 
     @Transactional
-    public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request, MultipartFile file) {
+    public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
         User user = User.fromUser(authUser);
 
         // 혹시 모르니 이부분은 안바꾸겠습니다.
@@ -67,9 +77,15 @@ public class CardService {
             throw new InvalidRequestException("작성할 List는 Workspace에 속해있지 않습니다.");
         }
 
-        // 담당자 멤버 ID 를 받아서 조회
-         Member assignedMember = memberRepository.findById(request.getMemberId()).orElseThrow(()-> new NotFoundException("멤버가 없습니다."));
+        // 워크스페이스 추가
+        Workspace workspace = workspaceRepository.findBySpaceIdWithJoinFetchBoard(request.getWorkspaceId(), request.getBoardId()).orElseThrow( () -> new BoardNotFoundException("보드가 없습니다.") );
 
+        Board board = workspace.getBoards().stream()
+                .filter(entity -> entity.getBoardId().equals(request.getBoardId())) // 필터 조건
+                .findFirst().orElseThrow(() -> new BoardNotFoundException("보드가 없습니다.")); // 첫 번째 매칭된 결과 반환
+
+        // 담당자 멤버 ID 를 받아서 조회
+        Member assignedMember = memberRepository.findById(request.getMemberId()).orElseThrow(()-> new NotFoundException("멤버가 없습니다."));
 
         Card newCard = new Card(
                 request.getCardTitle(),
@@ -78,19 +94,24 @@ public class CardService {
                 request.getFinishedAt(),
                 assignedMember,
                 user,
-                list
+                list,
+                board,
+                workspace
         );
         Card savedCard = cardRepository.save(newCard);
 
         // 파일 저장 로직
-        FileUploadDto fileUploadDto = FileUploadDto.builder()
-                .targetId(savedCard.getCardId())
-                .targetTable("card")
-                .targetFile(file)
-                .build();
+        if (request.getFile() != null || !request.getFile().isEmpty()) {
+            FileUploadDto fileUploadDto = FileUploadDto.builder()
+                    .targetId(savedCard.getCardId())
+                    .targetTable("card")
+                    .targetFile(request.getFile())
+                    .build();
 
-        fileService.uploadFile(fileUploadDto);
-        // 파일 저장 로직
+            fileService.uploadFile(fileUploadDto);
+            // 파일 저장 로직
+        }
+
 
         logCardActivity(savedCard, Action.CREATED, "제목: " + savedCard.getCardTitle()  +
                 ", 내용 : " + savedCard.getCardContent() +
