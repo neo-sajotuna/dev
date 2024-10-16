@@ -21,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 import static com.sparta.newneoboardbuddy.domain.user.entity.User.fromAuthUser;
 
 @Service
@@ -44,7 +42,7 @@ public class CommentService {
         Card card = getCardById(commentSaveRequestDto.getCardId());
 
         // 권한 체크
-        memberService.memberPermission(authUser, card.getWorkspace().getSpaceId());
+        memberService.verifyMember(authUser, card.getWorkspace().getSpaceId());
 
         // 유저 엔티티 변환
         User user = fromAuthUser(authUser);
@@ -86,7 +84,7 @@ public class CommentService {
         Comment comment = getCommentById(commentId);
 
         // 권한 체크
-        memberService.memberPermission(authUser, comment.getCard().getWorkspace().getSpaceId());
+        memberService.verifyMember(authUser, comment.getCard().getWorkspace().getSpaceId());
 
         // 자기가 작성한 글을 수정하는지 확인
         checkWriter(authUser.getId(), comment.getUser().getId());
@@ -117,7 +115,7 @@ public class CommentService {
         Comment comment = getCommentById(commentId);
 
         // 권한 체크
-        memberService.memberPermission(authUser, comment.getCard().getWorkspace().getSpaceId());
+        memberService.verifyMember(authUser, comment.getCard().getWorkspace().getSpaceId());
 
         // 자기가 작성한 글을 수정하는지 확인
         checkWriter(authUser.getId(), comment.getUser().getId());
