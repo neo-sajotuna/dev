@@ -8,7 +8,6 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString   //asfasfdfasdf
 public class BoardRequest {
     private Long spaceId;
     private String boardTitle;

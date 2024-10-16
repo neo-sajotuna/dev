@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name = "workspace")
+
 public class Workspace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -14,7 +14,7 @@ import lombok.ToString;
 @Setter
 @Table(name="Member")
 @NoArgsConstructor
-@ToString   //asfasfdfasdf
+
 public class Member {
 
     @Id

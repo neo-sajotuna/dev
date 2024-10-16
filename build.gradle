@@ -54,6 +54,9 @@ dependencies {
     // s3 셋팅
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+    // dummydata관련
+    implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.17'
 }
 
 tasks.named('test') {

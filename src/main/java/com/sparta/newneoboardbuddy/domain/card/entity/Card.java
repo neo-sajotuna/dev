@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -21,6 +22,7 @@ import java.util.List;
 @Getter
 @Table(name="Card")
 @NoArgsConstructor
+
 public class Card {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

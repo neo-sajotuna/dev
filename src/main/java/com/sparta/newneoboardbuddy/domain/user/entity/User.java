@@ -12,7 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
-@ToString   //asfasfdfasdf
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

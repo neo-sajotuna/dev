@@ -68,10 +68,12 @@ public class CardService {
 
         // 혹시 모르니 이부분은 안바꾸겠습니다.
         Member member = memberService.memberPermission(authUser, request.getWorkspaceId());
+        System.out.println("member = " + member);
 
         // 카드 추가될 리스트 조회
         BoardList list = boardListRepository.findByIdWithJoinFetchToWorkspace(listId).orElseThrow(() ->
                 new InvalidRequestException("list not found"));
+        System.out.println("list = " + list);
 
         // workspace에 해당 List가 속해 있는지 확인
         if (!hierarchyUtil.isListInWorkspace(request.getWorkspaceId(), list)) {
@@ -80,6 +82,7 @@ public class CardService {
 
         // 워크스페이스 추가
         Workspace workspace = workspaceRepository.findBySpaceIdWithJoinFetchBoard(request.getWorkspaceId(), request.getBoardId()).orElseThrow( () -> new BoardNotFoundException("보드가 없습니다.") );
+        System.out.println("workspace = " + workspace);
 
         Board board = workspace.getBoards().stream()
                 .filter(entity -> entity.getBoardId().equals(request.getBoardId())) // 필터 조건
