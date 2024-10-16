@@ -1,6 +1,8 @@
 package com.sparta.newneoboardbuddy.domain.card.dto.response;
 
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.entity.CardActivityLog;
+import com.sparta.newneoboardbuddy.domain.cardActivityLog.logResponse.LogResponseDto;
+import com.sparta.newneoboardbuddy.domain.comment.dto.response.CommentSaveResponseDto;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +21,7 @@ public class CardDetailResponse {
     private String cardContent;
     private LocalTime startedAt;
     private LocalTime finishedAt;
-    private List<CardActivityLog> activityLogs;
-    private List<Comment> comments;
+    private LogResponseDto activityLogDto;
+    private List<CommentSaveResponseDto> comments;
 
 }

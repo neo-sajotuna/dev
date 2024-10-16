@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @RequiredArgsConstructor
@@ -13,6 +14,6 @@ public class CardUpdateResponse {
     private final String cardTitle;
     private final String cardContent;
     private final Long memberId;
-    private final LocalDateTime activeTime;
+    private final LocalTime activeTime;
 
 }
