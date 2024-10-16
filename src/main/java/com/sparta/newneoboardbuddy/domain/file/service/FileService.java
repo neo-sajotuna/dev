@@ -12,6 +12,7 @@ import com.sparta.newneoboardbuddy.domain.file.exception.ImpossibilityExtensionE
 import com.sparta.newneoboardbuddy.domain.file.exception.NotFoundFileException;
 import com.sparta.newneoboardbuddy.domain.file.repository.S3FileRepository;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -41,27 +42,26 @@ public class FileService {
 
     private final MemberService memberService;
 
-    private String BASE_URL = "https://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/";
+    private String BASE_URL;
 
-    // 허용되는 파일 확장자 리스트
-    private final Set<String> ALLOWED_EXTENSIONS = new HashSet<String>() {{
-        add("jpg");
-        add("png");
-        add("pdf");
-        add("csv");
-    }};
+    private final Set<String> ALLOWED_EXTENSIONS = new HashSet<String>();
+
+    @PostConstruct
+    public void init(){
+        BASE_URL = "https://" + BUCKET_NAME + ".s3." + REGION + ".amazonaws.com/";
+
+        ALLOWED_EXTENSIONS.add("jpg");
+        ALLOWED_EXTENSIONS.add("png");
+        ALLOWED_EXTENSIONS.add("pdf");
+        ALLOWED_EXTENSIONS.add("csv");
+
+    }
 
     // 파일 사이즈 제한
     private final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void uploadFile(FileUploadDto fileUploadDto) {
-
-        // 파일 유효성 검사
-        if (fileUploadDto.getTargetFile() == null ||
-                fileUploadDto.getTargetFile().isEmpty()) {
-            throw new NotFoundFileException(HttpStatus.BAD_REQUEST);
-        }
 
         // 파일명 추출
         // 곂칠 우려가 있기 때문에 파일명에 랜덤값 추가
