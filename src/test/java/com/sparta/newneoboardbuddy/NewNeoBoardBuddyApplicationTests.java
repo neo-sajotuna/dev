@@ -1,20 +1,31 @@
 package com.sparta.newneoboardbuddy;
 
 import com.sparta.newneoboardbuddy.config.SlackNotificationUtil;
+import com.sparta.newneoboardbuddy.domain.board.entity.Board;
+import com.sparta.newneoboardbuddy.domain.card.entity.Card;
+import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
+import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
+import com.sparta.newneoboardbuddy.dummy.CreateDummyDataFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest
 class NewNeoBoardBuddyApplicationTests {
 
     @Autowired
     SlackNotificationUtil slackNotificationUtil;
+
+    @Autowired
+    CreateDummyDataFactory createDummyData;
 
     @Test
     void contextLoads() throws IOException {
@@ -24,6 +35,24 @@ class NewNeoBoardBuddyApplicationTests {
         ReflectionTestUtils.setField(user, "userRole", UserRole.ROLE_ADMIN);
 
         slackNotificationUtil.sendNewUser(user);
+    }
+
+    @Test
+    void createDummySet() {
+        int userSize = 10;
+        int workspaceSize = 10;
+        int boardSize = 10;
+        int boardListSize = 10;
+        int cardSize = 10;
+
+        List<User> users = createDummyData.createDummyUser(userSize);
+        List<Member> members = new ArrayList<Member>();
+        List<Workspace> workspaces = createDummyData.createDummyWorkspaces(workspaceSize, users, members);
+        members = createDummyData.saveMembers(members);
+        List<Board> boards = createDummyData.createDummyBoard(boardSize, workspaces);
+        List<BoardList> boardLists = createDummyData.createDummyBoardList(boardListSize, boards);
+        boardLists = createDummyData.getBoardListsFetchJoin();
+        List<Card> cards = createDummyData.createDummyCard(cardSize, members, workspaces, boardLists);
     }
 
 }
