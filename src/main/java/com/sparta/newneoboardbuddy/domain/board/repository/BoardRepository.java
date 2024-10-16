@@ -12,4 +12,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("select b from Board b join fetch b.workspace w " +
             "where b.boardId = :boardId")
     Optional<Board> findByBoardWithJoinFetchToWorkspace(Long boardId);
+
+    Optional<Board> findByBoardIdAndWorkspace(Long boardId, Workspace workspace);
 }
