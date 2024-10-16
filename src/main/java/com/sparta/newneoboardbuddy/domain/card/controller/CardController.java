@@ -55,13 +55,10 @@ public class CardController {
 
     @GetMapping("/cards/search")
     public ResponseEntity<Page<Card>> searchCards(
-            @RequestParam(required = false) String cardTitle,
-            @RequestParam(required = false) String cardContent,
-            @RequestParam(required = false) Long assignedMemberId,
-            @RequestParam(required = false) Long boardId,
+            @RequestParam(required = false, defaultValue = "9998") Long assignedMemberId,
             @PageableDefault(size=10, page=0) Pageable pageable
     ){
-        return ResponseEntity.ok(cardService.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable));
+        return ResponseEntity.ok(cardService.searchCards(assignedMemberId, pageable));
     }
 
 }
