@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.NoSuchElementException;
+
 @Service
 @RequiredArgsConstructor
 public class BoardService {
@@ -169,5 +171,10 @@ public class BoardService {
 
     }
 
+    public Board getBoardFetchJoinToWorkspace(Long boardId) {
+        return boardRepository.findByBoardWithJoinFetchToWorkspace(boardId).orElseThrow(
+                ()->new NoSuchElementException("해당 보드가 존재하지 않습니다.")
+        );
+    }
 
 }
