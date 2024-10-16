@@ -1,5 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.board.entity;
 
+import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardRequest;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import jakarta.persistence.*;
@@ -22,7 +23,7 @@ public class Board {
 
     private String boardTitle;
 
-    private String backgroundColor;
+    private String background;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_id", nullable = false)
@@ -31,4 +32,15 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<BoardList> boardLists = new ArrayList<>();
 
+    public Board(BoardRequest boardRequest, Workspace workspace) {
+        this.boardTitle = boardRequest.getBoardTitle();
+        this.background = boardRequest.getBackground();
+        this.workspace = workspace;
+    }
+
+    public void updateBoard(String boardTitle, String background) {
+        this.boardTitle = boardTitle;
+        this.background = background;
+
+    }
 }
