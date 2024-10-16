@@ -23,12 +23,13 @@ import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -148,7 +149,7 @@ public class CardService {
         cardActivityLogRepository.save(activityLog);
     }
 
-//    @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public CardDetailResponse getCardDetails(Long cardId) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(()-> new NotFoundException("카드가 없다."));
