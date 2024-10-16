@@ -3,7 +3,9 @@ package com.sparta.newneoboardbuddy.domain.list.entity;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.mapping.Join;
 
 import java.util.List;
@@ -11,10 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Entity
-@Setter
 @AllArgsConstructor
 @Table(name = "boardlist")
-
 public class BoardList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,6 @@ public class BoardList {
 
     private String title;
 
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long listIndex;
 
     @ManyToOne(fetch = FetchType.LAZY)
