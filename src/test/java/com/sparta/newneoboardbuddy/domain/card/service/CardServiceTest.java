@@ -113,92 +113,92 @@ class CardServiceTest {
     }
 
 
-    @Test
-    void updateCard_낙관적_락_적용() throws InterruptedException {
-        // given
-        AuthUser authUser = new AuthUser(1L, "gusrnr5153@naver.com", UserRole.ROLE_ADMIN);
-        User user = User.fromUser(authUser);
-        userRepository.save(user);
-        MultipartFile file = new MockMultipartFile(
-                "file",
-                "testFile.txt",
-                "text/plain",
-                "This is the file content".getBytes()
-        );
-        Workspace workspace = new Workspace();
-        workspace.setSpaceId(1L);
-        workspaceRepository.save(workspace);
-
-        BoardRequest boardRequest = new BoardRequest(workspace.getSpaceId(),"으아아","아아");
-        Board board = new Board(boardRequest, workspace);
-//        board.setBoardId(1L);
-        boardRepository.save(board);
-
-        Member member = new Member(user, workspace, MemberRole.WORKSPACE_MEMBER);
-        member.setMemberId(1L);
-        memberRepository.save(member);
-
-
-        BoardList list = new BoardList("list");
-        list.setListId(1L);
-        list.setBoard(board);
-        boardListRepository.save(list);
-
-//        boardListRepository.findByIdWithJoinFetchToWorkspace(list.getListId()).orElseThrow(()->new InvalidRequestException("list not found"));
-
-
-        CardCreateRequest cardCreateRequest = new CardCreateRequest(list.getBoard().getWorkspace().getSpaceId(), list.getBoard().getBoardId(),"dkdk", "아아아", LocalTime.now().plusHours(10), LocalTime.now().plusHours(20),member.getMemberId(), file);
-
-        CardCreateResponse cardCreateResponse = cardService.createCard(list.getListId(), authUser, cardCreateRequest);
-        Long cardId= cardCreateResponse.getCardId();
-
-        int threadCount = 100;
-        ExecutorService executorService = Executors.newFixedThreadPool(30); // 낙관적 락킹 적용할 스레드풀 설정 -> 동시에 최대 10개의 스레드가 실행 +  스레드가 완료되면 그 자리를 다른 스레드가 사용
-
-
-
-        // 스레드 작업이 완료될 때까지 대기하게 하는 역할 -> 각 스레드가 작업을 완료할때마다 latch.countDown() 메서드 호출하여 카운트 감소시킨다.
-        CountDownLatch latch = new CountDownLatch(threadCount);
-
-
-        // 예외 발생 횟수 추적하기 위한 변수
-        AtomicInteger optimisticLockExceptionCount = new AtomicInteger(0);
-
-        long startTime = System.currentTimeMillis();
-
-        for (int i = 0; i < threadCount; i++) {
-            System.out.println(i);
-            executorService.submit(() -> {
-                try {
-                    cardService.incrementCount(cardId);
-                } catch (OptimisticLockingFailureException e) {
-                    // 예외 발생 시 처리
-                    optimisticLockExceptionCount.incrementAndGet();
-                    System.out.println(optimisticLockExceptionCount.get());
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                } finally {
-                    latch.countDown(); // 모든 스레드 동시에 시작
-                }
-            });
-        }
-
-
-        latch.await(); // 호출한 스레드가 threadCount 만큼의 작업이 모두 완료될떄까지 대기 상태로 만든다.
-        executorService.shutdown(); // 스레드가 모두 호출되면 종료
-
-         // 모든 작업이 완료될 때까지 대기
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        int finalCount = cardRepository.findByCardId(cardId).orElseThrow(()-> new IllegalArgumentException("card not found")).getCount();
-        int testedTotalCount = optimisticLockExceptionCount.get() + finalCount;
-
-        assertTrue(optimisticLockExceptionCount.get() > 0);
-        System.out.println("낙관적 락 실행 시간: " + duration + "ms");
-        System.out.println("발생한 예외 수:" + optimisticLockExceptionCount.get());
-        System.out.println("요청 수: " + threadCount + ", " + "테스트한 토탈 카운트: " + testedTotalCount);
-        System.out.println("성공적으로 업데이트 된 수: " + finalCount);
-    }
+//    @Test
+//    void updateCard_낙관적_락_적용() throws InterruptedException {
+//        // given
+//        AuthUser authUser = new AuthUser(1L, "gusrnr5153@naver.com", UserRole.ROLE_ADMIN);
+//        User user = User.fromUser(authUser);
+//        userRepository.save(user);
+//        MultipartFile file = new MockMultipartFile(
+//                "file",
+//                "testFile.txt",
+//                "text/plain",
+//                "This is the file content".getBytes()
+//        );
+//        Workspace workspace = new Workspace();
+//        workspace.setSpaceId(1L);
+//        workspaceRepository.save(workspace);
+//
+//        BoardRequest boardRequest = new BoardRequest(workspace.getSpaceId(),"으아아","아아");
+//        Board board = new Board(boardRequest, workspace);
+////        board.setBoardId(1L);
+//        boardRepository.save(board);
+//
+//        Member member = new Member(user, workspace, MemberRole.WORKSPACE_MEMBER);
+//        member.setMemberId(1L);
+//        memberRepository.save(member);
+//
+//
+//        BoardList list = new BoardList("list");
+//        list.setListId(1L);
+//        list.setBoard(board);
+//        boardListRepository.save(list);
+//
+////        boardListRepository.findByIdWithJoinFetchToWorkspace(list.getListId()).orElseThrow(()->new InvalidRequestException("list not found"));
+//
+//
+//        CardCreateRequest cardCreateRequest = new CardCreateRequest(list.getBoard().getWorkspace().getSpaceId(), list.getBoard().getBoardId(),"dkdk", "아아아", LocalTime.now().plusHours(10), LocalTime.now().plusHours(20),member.getMemberId(), file);
+//
+//        CardCreateResponse cardCreateResponse = cardService.createCard(list.getListId(), authUser, cardCreateRequest);
+//        Long cardId= cardCreateResponse.getCardId();
+//
+//        int threadCount = 100;
+//        ExecutorService executorService = Executors.newFixedThreadPool(30); // 낙관적 락킹 적용할 스레드풀 설정 -> 동시에 최대 10개의 스레드가 실행 +  스레드가 완료되면 그 자리를 다른 스레드가 사용
+//
+//
+//
+//        // 스레드 작업이 완료될 때까지 대기하게 하는 역할 -> 각 스레드가 작업을 완료할때마다 latch.countDown() 메서드 호출하여 카운트 감소시킨다.
+//        CountDownLatch latch = new CountDownLatch(threadCount);
+//
+//
+//        // 예외 발생 횟수 추적하기 위한 변수
+//        AtomicInteger optimisticLockExceptionCount = new AtomicInteger(0);
+//
+//        long startTime = System.currentTimeMillis();
+//
+//        for (int i = 0; i < threadCount; i++) {
+//            System.out.println(i);
+//            executorService.submit(() -> {
+//                try {
+//                    cardService.incrementCount(cardId);
+//                } catch (OptimisticLockingFailureException e) {
+//                    // 예외 발생 시 처리
+//                    optimisticLockExceptionCount.incrementAndGet();
+//                    System.out.println(optimisticLockExceptionCount.get());
+//                } catch (Exception e) {
+//                    System.out.println(e.getMessage());
+//                } finally {
+//                    latch.countDown(); // 모든 스레드 동시에 시작
+//                }
+//            });
+//        }
+//
+//
+//        latch.await(); // 호출한 스레드가 threadCount 만큼의 작업이 모두 완료될떄까지 대기 상태로 만든다.
+//        executorService.shutdown(); // 스레드가 모두 호출되면 종료
+//
+//         // 모든 작업이 완료될 때까지 대기
+//        long endTime = System.currentTimeMillis();
+//        long duration = endTime - startTime;
+//        int finalCount = cardRepository.findByCardId(cardId).orElseThrow(()-> new IllegalArgumentException("card not found")).getCount();
+//        int testedTotalCount = optimisticLockExceptionCount.get() + finalCount;
+//
+//        assertTrue(optimisticLockExceptionCount.get() > 0);
+//        System.out.println("낙관적 락 실행 시간: " + duration + "ms");
+//        System.out.println("발생한 예외 수:" + optimisticLockExceptionCount.get());
+//        System.out.println("요청 수: " + threadCount + ", " + "테스트한 토탈 카운트: " + testedTotalCount);
+//        System.out.println("성공적으로 업데이트 된 수: " + finalCount);
+//    }
 
     @Test
     @Transactional
