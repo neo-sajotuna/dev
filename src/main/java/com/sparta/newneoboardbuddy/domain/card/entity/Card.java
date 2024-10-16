@@ -44,7 +44,7 @@ public class Card {
     private LocalTime finishedAt;
 
     @Column(name = "active_time")
-    private LocalDateTime activeTime;
+    private LocalTime activeTime;
 
     @Version
     private Integer version; // 낙관적 락 버전 필드
@@ -69,6 +69,9 @@ public class Card {
     @ManyToOne(fetch =FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE)
+    private List<CardActivityLog> cardActivityLogs = new ArrayList<>();
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
