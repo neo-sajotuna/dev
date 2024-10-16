@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -24,7 +25,7 @@ public class CardActivityLog {
     @Enumerated(EnumType.STRING)
     private Action action; // "Creation", "Doing", "Done", "Deleted"
 
-    private LocalDateTime activeTime;
+    private LocalTime activeTime;
 
     private String details; // 수정된 내용
 }
