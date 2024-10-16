@@ -27,11 +27,10 @@ public class CardController {
     @PostMapping("/list/{listId}/cards")
     public ResponseEntity<CardCreateResponse> createCard (
             @PathVariable Long listId,
-            @RequestBody CardCreateRequest request,
-            @AuthenticationPrincipal AuthUser authUser,
-            @RequestParam("file") MultipartFile file
+            @ModelAttribute CardCreateRequest request,
+            @AuthenticationPrincipal AuthUser authUser
     ){
-        return ResponseEntity.ok(cardService.createCard(listId ,authUser, request, file));
+        return ResponseEntity.ok(cardService.createCard(listId ,authUser, request));
     }
 
     @PutMapping ("/cards/{cardId}")
