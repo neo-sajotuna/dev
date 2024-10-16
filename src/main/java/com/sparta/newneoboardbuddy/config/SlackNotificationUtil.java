@@ -2,9 +2,9 @@ package com.sparta.newneoboardbuddy.config;
 
 import com.slack.api.Slack;
 import com.slack.api.webhook.WebhookResponse;
+import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +32,17 @@ public class SlackNotificationUtil {
                 "email : %s," +
                 "userRole : %s" +
                 PAY_LOAD_TAIL,  user.getId(), user.getEmail(), user.getUserRole().name());
+
+        sendNotice(payload);
+    }
+
+    public void sendNewComment(Comment comment, User user) {
+        String payload = String.format(PAY_LOAD_HEAD +
+                "신규 댓글 발생 : " +
+                "고유번호 : %d " +
+                "내용 : %s " +
+                "작성자 : %s " +
+                PAY_LOAD_TAIL,  comment.getCommentId(), comment.getComment(), user.getEmail());
 
         sendNotice(payload);
     }

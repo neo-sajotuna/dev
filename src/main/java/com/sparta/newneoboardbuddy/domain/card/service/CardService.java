@@ -3,6 +3,7 @@ package com.sparta.newneoboardbuddy.domain.card.service;
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
+import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardCreateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
@@ -49,6 +50,8 @@ public class CardService {
     private final CardActivityLogRepository cardActivityLogRepository;
     private final FileService fileService;
 
+    private final HierarchyUtil hierarchyUtil;
+
     @Transactional
     public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request, MultipartFile file) {
         User user = User.fromUser(authUser);
@@ -57,8 +60,13 @@ public class CardService {
         Member member = memberService.memberPermission(authUser, request.getWorkspaceId());
 
         // 카드 추가될 리스트 조회
-        BoardList list = boardListRepository.findById(listId).orElseThrow(() ->
+        BoardList list = boardListRepository.findByIdWithJoinFetchToWorkspace(listId).orElseThrow(() ->
                 new InvalidRequestException("list not found"));
+
+        // workspace에 해당 List가 속해 있는지 확인
+        if (!hierarchyUtil.isListInWorkspace(request.getWorkspaceId(), list)) {
+            throw new InvalidRequestException("작성할 List는 Workspace에 속해있지 않습니다.");
+        }
 
         // 담당자 멤버 ID 를 받아서 조회
          Member assignedMember = memberRepository.findById(request.getMemberId()).orElseThrow(()-> new NotFoundException("멤버가 없습니다."));
