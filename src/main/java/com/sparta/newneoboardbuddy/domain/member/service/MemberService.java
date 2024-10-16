@@ -22,7 +22,7 @@ public class MemberService {
     private final WorkspaceRepository workspaceRepository;
 
 
-    public Member memberPermission(AuthUser authUser, Long workspaceId) {
+    public Member verifyMember(AuthUser authUser, Long workspaceId) {
         User user = User.fromUser(authUser);
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
