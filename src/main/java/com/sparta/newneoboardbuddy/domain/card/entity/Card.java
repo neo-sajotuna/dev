@@ -43,6 +43,9 @@ public class Card {
     @Column(name = "active_time")
     private LocalDateTime activeTime;
 
+    @Version
+    private Integer version; // 낙관적 락 버전 필드
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardList_id", nullable = false)
     private BoardList boardList;
@@ -74,7 +77,6 @@ public class Card {
         this.member = member;
         this.user = user;
         this.boardList = list;
-
-
     }
+
 }

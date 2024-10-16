@@ -13,6 +13,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardUpdateRequest {
+    private Long workspaceId;
     private String cardTitle;
     private String cardContent;
     private Long memberId;

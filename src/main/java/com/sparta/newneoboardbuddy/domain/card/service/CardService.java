@@ -26,15 +26,14 @@ import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -110,8 +109,17 @@ public class CardService {
 
 
     public CardUpdateResponse updateCard(Long cardId, AuthUser authUser, CardUpdateRequest request) {
-        Card card = cardRepository.findById(cardId).orElseThrow(()->
-                new NoSuchElementException("카드를 찾을 수 없다."));
+//        Card card = cardRepository.findById(cardId).orElseThrow(()->
+//                new NoSuchElementException("카드를 찾을 수 없다."));
+
+        // 카드 추가될 리스트 조회
+        Card card = cardRepository.findByIdWithJoinFetchToWorkspace(cardId).orElseThrow(() ->
+                new InvalidRequestException("card not found"));
+
+        // workspace에 해당 List가 속해 있는지 확인
+        if (!hierarchyUtil.isCardInWorkspace(request.getWorkspaceId(), card)) {
+            throw new InvalidRequestException("작성할 Card는 Workspace에 속해있지 않습니다.");
+        }
 
         // 수정 전 현재 상태
         String oldTitle = card.getCardTitle();
@@ -135,15 +143,29 @@ public class CardService {
             card.setMember(assignedMember);
         }
 
-        Card updateCard = cardRepository.save(card);
 
-        logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
-                ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
-                ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
+        // 낙관적 락 적용
+        try{
+            Card updateCard = cardRepository.save(card);
+            logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
+                    ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
+                    ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
+            return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActiveTime());
+        } catch (OptimisticLockingFailureException e){
+            throw new InvalidRequestException("이 카드는 다른 사용자에 의해 이미 수정되었습니다. 다시 시도해주세요");
+        }
+    }
 
 
-        return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActiveTime());
 
+    // 비관적 락 사용
+    public void updateCardWithLock(Long cardId, CardUpdateRequest request) {
+        // 비관적 락 사용 시
+        Card card = cardRepository.findCardWithLock(cardId);
+        card.setCardTitle(request.getCardTitle());
+        card.setCardContent(request.getCardContent());
+
+        cardRepository.save(card);
     }
 
     // 활동 로그 메서드
@@ -182,19 +204,23 @@ public class CardService {
 
     public void deleteCard(Long cardId, AuthUser authUser) {
         // 카드 조회
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(()-> new NotFoundException("카드 낫 파운드"));
+        // 카드 추가될 리스트 조회
+        Card card = cardRepository.findByIdWithJoinFetchToWorkspace(cardId).orElseThrow(() ->
+                new InvalidRequestException("card not found"));
 
         Long workspaceId = card.getWorkspace().getSpaceId();
 
         Member member = memberService.memberPermission(authUser, workspaceId);
 
+        // workspace에 해당 List가 속해 있는지 확인
+        if (!hierarchyUtil.isCardInWorkspace(workspaceId, card)) {
+            throw new InvalidRequestException("작성할 Card는 Workspace에 속해있지 않습니다.");
+        }
+
         // 읽기 전용 유저가 카드 삭제 시도시 예외 처리
         if(member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
             throw new InvalidRequestException("읽기 전용 멤버는 카드를 삭제할 수 없습니다.");
         }
-
-
 
         cardRepository.delete(card);
     }

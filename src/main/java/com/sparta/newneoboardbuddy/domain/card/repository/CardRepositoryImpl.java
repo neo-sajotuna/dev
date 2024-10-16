@@ -5,6 +5,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.entity.QCard;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardRepositoryImpl implements CardRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId , Long boardId, Pageable pageable){
@@ -61,5 +67,12 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
 
         return new PageImpl<>(cards, pageable, total);
 
+    }
+
+
+    // 비관적 락
+    @Override
+    public Card findCardWithLock(Long cardId){
+        return entityManager.find(Card.class, cardId, LockModeType.PESSIMISTIC_WRITE);
     }
 }
