@@ -20,6 +20,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Table(name="Card")
 @NoArgsConstructor
 
