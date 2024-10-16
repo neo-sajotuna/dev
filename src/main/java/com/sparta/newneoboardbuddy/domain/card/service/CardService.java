@@ -15,9 +15,9 @@ import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.entity.CardActivityLog;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.enums.Action;
+import com.sparta.newneoboardbuddy.domain.cardActivityLog.logResponse.LogResponseDto;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
-import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
-import com.sparta.newneoboardbuddy.domain.file.dto.request.FileUploadDto;
+import com.sparta.newneoboardbuddy.domain.comment.dto.response.CommentSaveResponseDto;
 import com.sparta.newneoboardbuddy.domain.file.service.FileService;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
@@ -26,16 +26,16 @@ import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
-
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -161,12 +161,18 @@ public class CardService {
         }
 
 
+
         // 낙관적 락 적용
             Card updateCard = cardRepository.save(card);
             logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
                     ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
                     ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
-            return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActiveTime());
+
+        LocalTime latestActiveTime = cardActivityLogRepository.findFirstByCard_CardIdOrderByActiveTimeDesc(updateCard.getCardId())
+                .map(CardActivityLog::getActiveTime) // CardActivityLog에서 activeTime 값만 추출
+                .orElseThrow(()-> new NotFoundException("활동시간 없다."));
+
+        return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), latestActiveTime);
     }
 
 
@@ -187,7 +193,7 @@ public class CardService {
         activityLog.setCard(card);
         activityLog.setAction(action);
         activityLog.setDetails(details);
-        activityLog.setActiveTime(LocalDateTime.now());
+        activityLog.setActiveTime(LocalTime.now());
 
         cardActivityLogRepository.save(activityLog);
     }
@@ -197,11 +203,20 @@ public class CardService {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(()-> new NotFoundException("카드가 없다."));
 
+        CardActivityLog activityLog = cardActivityLogRepository.findTopByCardOrderByActiveTimeDesc(card)
+                .orElseThrow(()-> new NotFoundException("카드 활동 내역 없다"));
+
         // 카드 활동 내역 조회
-        List<CardActivityLog> activityLogs = cardActivityLogRepository.findByCard(card);
+        LogResponseDto activityLogDto = new LogResponseDto(activityLog);
 
         // 카드 댓글 조회
-        List<Comment> comments = card.getComments();
+        List<CommentSaveResponseDto> commentsDto = card.getComments().stream()
+                .map(comment -> new CommentSaveResponseDto(
+                        comment.getCommentId(),
+                        comment.getComment(),
+                        comment.getEmoji(),
+                        comment.getCreatedAt()))
+                .toList();
 
         return new CardDetailResponse(
                 card.getCardId(),
@@ -209,8 +224,8 @@ public class CardService {
                 card.getCardContent(),
                 card.getStartedAt(),
                 card.getFinishedAt(),
-                activityLogs,
-                comments
+                activityLogDto,
+                commentsDto
         );
     }
 
@@ -230,16 +245,11 @@ public class CardService {
             throw new InvalidRequestException("작성할 Card는 Workspace에 속해있지 않습니다.");
         }
 
-        // 읽기 전용 유저가 카드 삭제 시도시 예외 처리
-        if(member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
-            throw new InvalidRequestException("읽기 전용 멤버는 카드를 삭제할 수 없습니다.");
-        }
-
         cardRepository.delete(card);
     }
 
-    public Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable) {
-        return cardRepository.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable);
+    public Page<CardCreateResponse> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable) {
+        return new PageImpl<>(cardRepository.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable).stream().map(CardCreateResponse::new).toList());
 
     }
 }

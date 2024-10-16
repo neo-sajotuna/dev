@@ -54,7 +54,7 @@ public class CardController {
 
 
     @GetMapping("/cards/search")
-    public ResponseEntity<Page<Card>> searchCards(
+    public ResponseEntity<Page<CardCreateResponse>> searchCards(
             @RequestParam(required = false) String cardTitle,
             @RequestParam(required = false) String cardContent,
             @RequestParam(required = false) Long assignedMemberId,
