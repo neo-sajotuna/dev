@@ -16,7 +16,7 @@ public class BoardList {
 
     private String title;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long index;
 
     @ManyToOne(fetch = FetchType.LAZY)
