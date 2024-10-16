@@ -7,12 +7,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
 @Table(name="Member")
 @NoArgsConstructor
+@ToString   //asfasfdfasdf
 public class Member {
 
     @Id

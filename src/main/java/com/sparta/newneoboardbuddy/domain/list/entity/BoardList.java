@@ -3,9 +3,7 @@ package com.sparta.newneoboardbuddy.domain.list.entity;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.mapping.Join;
 
 import java.util.List;
@@ -13,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Entity
+@Setter
 @AllArgsConstructor
 @Table(name = "boardlist")
 public class BoardList {

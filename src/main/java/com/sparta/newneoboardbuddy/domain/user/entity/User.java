@@ -5,12 +5,14 @@ import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Getter
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
+@ToString   //asfasfdfasdf
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

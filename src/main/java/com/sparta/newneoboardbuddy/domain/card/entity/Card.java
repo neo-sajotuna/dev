@@ -19,7 +19,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Table(name="Card")
 @NoArgsConstructor
 public class Card {
@@ -28,9 +27,11 @@ public class Card {
     @Column(name="card_id")
     private Long cardId;
 
+    @Setter
     @Column(name= "card_title")
     private String cardTitle;
 
+    @Setter
     @Column(name="card_content")
     private String cardContent;
 
@@ -45,6 +46,8 @@ public class Card {
 
     @Version
     private Integer version; // 낙관적 락 버전 필드
+
+    private int count;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardList_id", nullable = false)
@@ -65,6 +68,7 @@ public class Card {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;

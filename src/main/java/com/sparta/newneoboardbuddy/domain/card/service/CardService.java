@@ -1,6 +1,7 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
+import com.sparta.newneoboardbuddy.common.exception.CommonOptimisticLockingFailureException;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
 import com.sparta.newneoboardbuddy.config.HierarchyUtil;
@@ -166,15 +167,11 @@ public class CardService {
 
 
         // 낙관적 락 적용
-        try{
             Card updateCard = cardRepository.save(card);
             logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
                     ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
                     ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
             return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActiveTime());
-        } catch (OptimisticLockingFailureException e){
-            throw new InvalidRequestException("이 카드는 다른 사용자에 의해 이미 수정되었습니다. 다시 시도해주세요");
-        }
     }
 
 
