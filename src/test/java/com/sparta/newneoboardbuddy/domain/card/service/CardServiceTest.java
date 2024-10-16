@@ -153,9 +153,15 @@ class CardServiceTest {
         Long cardId= cardCreateResponse.getCardId();
 
         int threadCount = 100;
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(30); // 낙관적 락킹 적용할 스레드풀 설정 -> 동시에 최대 10개의 스레드가 실행 +  스레드가 완료되면 그 자리를 다른 스레드가 사용
 
+
+
+        // 스레드 작업이 완료될 때까지 대기하게 하는 역할 -> 각 스레드가 작업을 완료할때마다 latch.countDown() 메서드 호출하여 카운트 감소시킨다.
         CountDownLatch latch = new CountDownLatch(threadCount);
+
+
+        // 예외 발생 횟수 추적하기 위한 변수
         AtomicInteger optimisticLockExceptionCount = new AtomicInteger(0);
 
         long startTime = System.currentTimeMillis();
@@ -164,8 +170,7 @@ class CardServiceTest {
             System.out.println(i);
             executorService.submit(() -> {
                 try {
-                    CardUpdateRequest request = new CardUpdateRequest(workspace.getSpaceId(),"new title","new content", member.getMemberId(), LocalTime.now());
-                    cardService.updateCard(cardId, authUser, request); // 낙관적 락을 적용한 메서드 호출
+                    cardService.incrementCount(cardId);
                 } catch (OptimisticLockingFailureException e) {
                     // 예외 발생 시 처리
                     optimisticLockExceptionCount.incrementAndGet();
@@ -178,8 +183,9 @@ class CardServiceTest {
             });
         }
 
-        latch.await();
-        executorService.shutdown();
+
+        latch.await(); // 호출한 스레드가 threadCount 만큼의 작업이 모두 완료될떄까지 대기 상태로 만든다.
+        executorService.shutdown(); // 스레드가 모두 호출되면 종료
 
          // 모든 작업이 완료될 때까지 대기
         long endTime = System.currentTimeMillis();
@@ -191,43 +197,12 @@ class CardServiceTest {
         System.out.println("낙관적 락 실행 시간: " + duration + "ms");
         System.out.println("발생한 예외 수:" + optimisticLockExceptionCount.get());
         System.out.println("요청 수: " + threadCount + ", " + "테스트한 토탈 카운트: " + testedTotalCount);
-        System.out.println(optimisticLockExceptionCount.get());
-        System.out.println(finalCount);
+        System.out.println("성공적으로 업데이트 된 수: " + finalCount);
     }
 
     @Test
     @Transactional
     void testPessimisticLockingPerformance() throws InterruptedException {
-//        // given
-//        Long memberId = 2L;
-//        Long cardId = 1L;
-//        AuthUser authUser = new AuthUser(1L, "gusrnr5153@naver.com", UserRole.ROLE_ADMIN);
-//        CardUpdateRequest request = new CardUpdateRequest("New Title", "New Content", memberId, LocalTime.now());
-//
-//        int threadCount = 100;
-//        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-//        CountDownLatch latch = new CountDownLatch(threadCount);
-//
-//        long startTime = System.currentTimeMillis();
-//
-//        for (int i = 0; i < threadCount; i++) {
-//            executorService.submit(() -> {
-//                try {
-//                    cardService.updateCardWithLock(cardId, request); // 비관적 락을 적용한 메서드 호출
-//                    cardService.updateCard(cardId, authUser, request); // 카드를 수정
-//                } catch (Exception e) {
-//                    // 예외 발생 시 처리
-//                    System.out.println("Exception: " + e.getMessage());
-//                } finally {
-//                    latch.countDown();
-//                }
-//            });
-//        }
-//
-//        latch.await(10, TimeUnit.SECONDS); // 모든 작업이 완료될 때까지 대기
-//        long endTime = System.currentTimeMillis();
-//
-//        System.out.println("비관적 락 소요 시간: " + (endTime - startTime) + "ms");
     }
     @Test
     void getCardDetails() {
