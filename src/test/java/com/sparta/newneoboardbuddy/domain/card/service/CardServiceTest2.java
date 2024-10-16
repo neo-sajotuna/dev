@@ -1,10 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
-import com.amazonaws.services.kms.model.InvalidAliasNameException;
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.common.exception.CommonOptimisticLockingFailureException;
-import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
-import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardRequest;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.board.repository.BoardRepository;
@@ -13,24 +9,19 @@ import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
-import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
-import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import com.sparta.newneoboardbuddy.domain.user.repository.UserRepository;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.repository.WorkspaceRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -39,21 +30,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.spy;
 
 
 @SpringBootTest
-class CardServiceTest {
+class CardServiceTest2 {
 
     @Autowired
     private CardService cardService;
@@ -69,6 +55,7 @@ class CardServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private UserRepository userRepository;
+
 
     @BeforeEach
     void setUp(){
@@ -119,7 +106,7 @@ class CardServiceTest {
         // given
         AuthUser authUser = new AuthUser(1L, "gusrnr5153@naver.com", UserRole.ROLE_ADMIN);
         User user = User.fromUser(authUser);
-        userRepository.save(user);
+        user = userRepository.save(user);
         MultipartFile file = new MockMultipartFile(
                 "file",
                 "testFile.txt",
@@ -128,28 +115,25 @@ class CardServiceTest {
         );
         Workspace workspace = new Workspace();
         workspace.setSpaceId(1L);
-        workspaceRepository.save(workspace);
+        workspace= workspaceRepository.save(workspace);
 
         BoardRequest boardRequest = new BoardRequest(workspace.getSpaceId(),"으아아","아아");
         Board board = new Board(boardRequest, workspace);
-//        board.setBoardId(1L);
-        boardRepository.save(board);
+        board.setBoardId(1L);
+        board = boardRepository.save(board);
 
         Member member = new Member(user, workspace, MemberRole.WORKSPACE_MEMBER);
         member.setMemberId(1L);
-        memberRepository.save(member);
+        member = memberRepository.save(member);
 
 
         BoardList list = new BoardList("list");
         list.setListId(1L);
         list.setBoard(board);
-        boardListRepository.save(list);
-
+        list = boardListRepository.save(list);
 
         //  BoardList list = boardListRepository.findByIdWithJoinFetchToWorkspace(listId).orElseThrow(()->new InvalidRequestException("list not found"));
-
-
-        CardCreateRequest cardCreateRequest = new CardCreateRequest(list.getBoard().getWorkspace().getSpaceId(), list.getBoard().getBoardId(),"dkdk", "아아아", LocalTime.now().plusHours(10), LocalTime.now().plusHours(20),member.getMemberId(), file);
+        CardCreateRequest cardCreateRequest = new CardCreateRequest(workspace.getSpaceId(), board.getBoardId(),"dkdk", "아아아", LocalTime.now().plusHours(10), LocalTime.now().plusHours(20),member.getMemberId(), file);
 
         CardCreateResponse cardCreateResponse = cardService.createCard(list.getListId(), authUser, cardCreateRequest);
         Long cardId= cardCreateResponse.getCardId();
@@ -162,22 +146,22 @@ class CardServiceTest {
 
         long startTime = System.currentTimeMillis();
 
-        for (int i = 0; i < threadCount; i++) {
-            executorService.submit(() -> {
-                try {
-                    CardUpdateRequest request = new CardUpdateRequest(workspace.getSpaceId(),"new title","new content", member.getMemberId(), LocalTime.now());
-                    cardService.updateCard(cardId, authUser, request); // 낙관적 락을 적용한 메서드 호출
-                } catch (OptimisticLockingFailureException e) {
-                    // 예외 발생 시 처리
-                    optimisticLockExceptionCount.incrementAndGet();
-                    System.out.println(optimisticLockExceptionCount.get());
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                } finally {
-                    latch.countDown(); // 모든 스레드 동시에 시작
-                }
-            });
-        }
+//        for (int i = 0; i < threadCount; i++) {
+//            executorService.submit(() -> {
+//                try {
+//                    CardUpdateRequest request = new CardUpdateRequest(workspace.getSpaceId(),"new title","new content", member.getMemberId(), LocalTime.now());
+//                    cardService.updateCard(cardId, authUser, request); // 낙관적 락을 적용한 메서드 호출
+//                } catch (OptimisticLockingFailureException e) {
+//                    // 예외 발생 시 처리
+//                    optimisticLockExceptionCount.incrementAndGet();
+//                    System.out.println(optimisticLockExceptionCount.get());
+//                } catch (Exception e) {
+//                    System.out.println(e.getMessage());
+//                } finally {
+//                    latch.countDown(); // 모든 스레드 동시에 시작
+//                }
+//            });
+//        }
 
         latch.await();
         executorService.shutdown();

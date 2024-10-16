@@ -1,5 +1,6 @@
 package com.sparta.newneoboardbuddy.config;
 
+import com.sparta.newneoboardbuddy.common.exception.CommonOptimisticLockingFailureException;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
 import jakarta.security.auth.message.AuthException;
@@ -52,6 +53,11 @@ public class GlobalExceptionHandler {
         return getErrorResponse(status, ex.getMessage());
     }
 
+    @ExceptionHandler(CommonOptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> commonOptimisticLockingFailureException(CommonOptimisticLockingFailureException ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return getErrorResponse(status, ex.getMessage());
+    }
 
     public ResponseEntity<Map<String, Object>> getErrorResponse(HttpStatus status, String message) {
         Map<String, Object> errorResponse = new HashMap<>();
