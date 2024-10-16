@@ -176,6 +176,14 @@ public class CardService {
     }
 
 
+    // 낙관적 락 사용
+    @Transactional
+    public void incrementCount(Long cardId){
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new IllegalArgumentException("카드 없다"));
+        card.setCount(card.getCount() + 1);
+        cardRepository.save(card);
+    }
 
     // 비관적 락 사용
     public void updateCardWithLock(Long cardId, CardUpdateRequest request) {
