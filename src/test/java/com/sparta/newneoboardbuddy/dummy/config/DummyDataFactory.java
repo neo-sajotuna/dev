@@ -1,4 +1,4 @@
-package com.sparta.newneoboardbuddy.dummy;
+package com.sparta.newneoboardbuddy.dummy.config;
 
 import com.github.javafaker.Faker;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Component
-public class CreateDummyDataFactory {
+public class DummyDataFactory {
 
     @Autowired
     private CardRepository cardRepository;

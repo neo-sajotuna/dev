@@ -20,9 +20,9 @@ import java.util.List;
 
 @Entity
 @Getter
-@Table(name="Card")
+@Table(name="Card", indexes = @Index(name = "card_titles", columnList = "cardTitle"))
+// @Table(name="Card")
 @NoArgsConstructor
-
 public class Card {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +44,7 @@ public class Card {
     private LocalTime finishedAt;
 
     @Column(name = "active_time")
-    private LocalDateTime activeTime;
+    private LocalTime activeTime;
 
     @Version
     private Integer version; // 낙관적 락 버전 필드
@@ -70,6 +70,9 @@ public class Card {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE)
+    private List<CardActivityLog> cardActivityLogs = new ArrayList<>();
+
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id",nullable = false)
@@ -85,6 +88,10 @@ public class Card {
         this.boardList = list;
         this.board = board;
         this.workspace = workspace;
+    }
+
+    public void addTestCount() {
+        this.count++;
     }
 
 }

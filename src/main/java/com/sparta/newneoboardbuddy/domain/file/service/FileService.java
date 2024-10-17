@@ -99,7 +99,7 @@ public class FileService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteFile(AuthUser authUser, FileDeleteDto fileDeleteDto) {
 
-        memberService.memberPermission(authUser, fileDeleteDto.getWorkspaceId());
+        memberService.verifyMember(authUser, fileDeleteDto.getWorkspaceId());
 
         S3File s3File = findS3File(fileDeleteDto.getTargetId(), fileDeleteDto.getTargetTable());
 

@@ -2,8 +2,11 @@ package com.sparta.newneoboardbuddy.domain.card.repository;
 import java.util.Optional;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface CardRepository extends JpaRepository<Card, Long>, CardRepositoryCustom {
 
@@ -21,4 +24,5 @@ public interface CardRepository extends JpaRepository<Card, Long>, CardRepositor
             "join fetch b.workspace  " +
             "where c.cardId = :cardId")
     Optional<Card> findByIdWithJoinFetchToWorkspace(Long cardId);
+
 }

@@ -1,14 +1,12 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.common.exception.CommonOptimisticLockingFailureException;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
 import com.sparta.newneoboardbuddy.common.service.RedisService;
 import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.board.exception.BoardNotFoundException;
-import com.sparta.newneoboardbuddy.domain.board.repository.BoardRepository;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardCreateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
@@ -18,10 +16,9 @@ import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.entity.CardActivityLog;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.enums.Action;
+import com.sparta.newneoboardbuddy.domain.cardActivityLog.logResponse.LogResponseDto;
 import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
-import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
-import com.sparta.newneoboardbuddy.domain.file.dto.request.FileUploadDto;
-import com.sparta.newneoboardbuddy.domain.file.exception.NotFoundFileException;
+import com.sparta.newneoboardbuddy.domain.comment.dto.response.CommentSaveResponseDto;
 import com.sparta.newneoboardbuddy.domain.file.service.FileService;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
@@ -30,22 +27,17 @@ import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
-
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +61,7 @@ public class CardService {
         User user = User.fromUser(authUser);
 
         // 혹시 모르니 이부분은 안바꾸겠습니다.
-        Member member = memberService.memberPermission(authUser, request.getWorkspaceId());
+        Member member = memberService.verifyMember(authUser, request.getWorkspaceId());
         System.out.println("member = " + member);
 
         // 카드 추가될 리스트 조회
@@ -107,16 +99,16 @@ public class CardService {
         Card savedCard = cardRepository.save(newCard);
 
         // 파일 저장 로직
-        if (request.getFile() != null || !request.getFile().isEmpty()) {
-            FileUploadDto fileUploadDto = FileUploadDto.builder()
-                    .targetId(savedCard.getCardId())
-                    .targetTable("card")
-                    .targetFile(request.getFile())
-                    .build();
+//        if (request.getFile() != null || !request.getFile().isEmpty()) {
+//            FileUploadDto fileUploadDto = FileUploadDto.builder()
+//                    .targetId(savedCard.getCardId())
+//                    .targetTable("card")
+//                    .targetFile(request.getFile())
+//                    .build();
 
-            fileService.uploadFile(fileUploadDto);
+//            fileService.uploadFile(fileUploadDto);
             // 파일 저장 로직
-        }
+//        }
 
 
         logCardActivity(savedCard, Action.CREATED, "제목: " + savedCard.getCardTitle()  +
@@ -136,10 +128,7 @@ public class CardService {
 
 
     public CardUpdateResponse updateCard(Long cardId, AuthUser authUser, CardUpdateRequest request) {
-//        Card card = cardRepository.findById(cardId).orElseThrow(()->
-//                new NoSuchElementException("카드를 찾을 수 없다."));
-
-        // 카드 추가될 리스트 조회
+        // 카드 추가될 리스트  (낙관적 락)
         Card card = cardRepository.findByIdWithJoinFetchToWorkspace(cardId).orElseThrow(() ->
                 new InvalidRequestException("card not found"));
 
@@ -157,7 +146,7 @@ public class CardService {
         card.setCardContent(request.getCardContent());
 
         Long workspaceId = card.getWorkspace().getSpaceId();
-        Member member = memberService.memberPermission(authUser, workspaceId);
+        Member member = memberService.verifyMember(authUser, workspaceId);
 
         // 읽기 전용 유저 생성 못하게 예외처리 해야함
         if (member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
@@ -171,23 +160,27 @@ public class CardService {
         }
 
 
+
         // 낙관적 락 적용
-            Card updateCard = cardRepository.save(card);
-            logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
-                    ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
-                    ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
-            return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), updateCard.getActiveTime());
+        Card updateCard = cardRepository.save(card);
+        logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
+                ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
+                ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
+
+        LocalTime latestActiveTime = cardActivityLogRepository.findFirstByCard_CardIdOrderByActiveTimeDesc(updateCard.getCardId())
+                .map(CardActivityLog::getActiveTime) // CardActivityLog에서 activeTime 값만 추출
+                .orElseThrow(()-> new NotFoundException("활동시간 없다."));
+
+        return new CardUpdateResponse(updateCard.getCardId(), updateCard.getCardTitle(), updateCard.getCardContent(), updateCard.getMember().getMemberId(), latestActiveTime);
     }
 
 
-
-    // 비관적 락 사용
-    public void updateCardWithLock(Long cardId, CardUpdateRequest request) {
-        // 비관적 락 사용 시
-        Card card = cardRepository.findCardWithLock(cardId);
-        card.setCardTitle(request.getCardTitle());
-        card.setCardContent(request.getCardContent());
-
+    // 낙관적 락 사용
+    @Transactional
+    public void incrementCount(Long cardId){
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new IllegalArgumentException("카드 없다"));
+        card.addTestCount();
         cardRepository.save(card);
     }
 
@@ -197,7 +190,7 @@ public class CardService {
         activityLog.setCard(card);
         activityLog.setAction(action);
         activityLog.setDetails(details);
-        activityLog.setActiveTime(LocalDateTime.now());
+        activityLog.setActiveTime(LocalTime.now());
 
         cardActivityLogRepository.save(activityLog);
     }
@@ -207,14 +200,23 @@ public class CardService {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(()-> new NotFoundException("카드가 없다."));
 
+        CardActivityLog activityLog = cardActivityLogRepository.findTopByCardOrderByActiveTimeDesc(card)
+                .orElseThrow(()-> new NotFoundException("카드 활동 내역 없다"));
+
         // 카드 활동 내역 조회
-        List<CardActivityLog> activityLogs = cardActivityLogRepository.findByCard(card);
+        LogResponseDto activityLogDto = new LogResponseDto(activityLog);
 
         // 카드 조회 시 조회카운트
         redisService.incrementCardView("card", cardId, authUser.getId());
 
         // 카드 댓글 조회
-        List<Comment> comments = card.getComments();
+        List<CommentSaveResponseDto> commentsDto = card.getComments().stream()
+                .map(comment -> new CommentSaveResponseDto(
+                        comment.getCommentId(),
+                        comment.getComment(),
+                        comment.getEmoji(),
+                        comment.getCreatedAt()))
+                .toList();
 
         return new CardDetailResponse(
                 card.getCardId(),
@@ -222,8 +224,8 @@ public class CardService {
                 card.getCardContent(),
                 card.getStartedAt(),
                 card.getFinishedAt(),
-                activityLogs,
-                comments
+                activityLogDto,
+                commentsDto
         );
     }
 
@@ -236,23 +238,21 @@ public class CardService {
 
         Long workspaceId = card.getWorkspace().getSpaceId();
 
-        Member member = memberService.memberPermission(authUser, workspaceId);
+        Member member = memberService.verifyMember(authUser, workspaceId);
 
         // workspace에 해당 List가 속해 있는지 확인
         if (!hierarchyUtil.isCardInWorkspace(workspaceId, card)) {
             throw new InvalidRequestException("작성할 Card는 Workspace에 속해있지 않습니다.");
         }
 
-        // 읽기 전용 유저가 카드 삭제 시도시 예외 처리
-        if(member.getMemberRole() == MemberRole.READ_ONLY_MEMBER){
-            throw new InvalidRequestException("읽기 전용 멤버는 카드를 삭제할 수 없습니다.");
-        }
-
         cardRepository.delete(card);
     }
 
-    public Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable) {
-        return cardRepository.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable);
+    public Page<CardCreateResponse> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable) {
+        return new PageImpl<>(cardRepository.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable).stream().map(CardCreateResponse::new).toList());
+    }
 
+    public Page<Card> searchCards(Long assignedMemberId, Pageable pageable) {
+        return cardRepository.searchCards(assignedMemberId, pageable);
     }
 }
