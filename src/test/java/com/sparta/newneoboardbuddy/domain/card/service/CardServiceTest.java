@@ -25,6 +25,7 @@ import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import com.sparta.newneoboardbuddy.domain.user.repository.UserRepository;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.repository.WorkspaceRepository;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -117,8 +118,8 @@ class CardServiceTest {
         CardCreateResponse cardCreateResponse = cardService.createCard(list.getListId(), authUser, cardCreateRequest);
         Long cardId= cardCreateResponse.getCardId();
 
-        int threadCount = 100;
-        ExecutorService executorService = Executors.newFixedThreadPool(0); // 낙관적 락킹 적용할 스레드풀 설정 -> 동시에 최대 10개의 스레드가 실행 +  스레드가 완료되면 그 자리를 다른 스레드가 사용
+        int threadCount = 1000;
+        ExecutorService executorService = Executors.newFixedThreadPool(10); // 낙관적 락킹 적용할 스레드풀 설정 -> 동시에 최대 10개의 스레드가 실행 +  스레드가 완료되면 그 자리를 다른 스레드가 사용
 
 
 
@@ -159,10 +160,10 @@ class CardServiceTest {
         int testedTotalCount = optimisticLockExceptionCount.get() + finalCount;
 
         assertTrue(optimisticLockExceptionCount.get() > 0);
-        System.out.println("Optimistic Lock duration : " + duration + "ms");
-        System.out.println("exception :" + optimisticLockExceptionCount.get());
-        System.out.println("thread count : " + threadCount + ", " + "test total count: " + testedTotalCount);
-        System.out.println("최종 카운트: " + finalCount);
+        System.out.println("낙관적 락 실행시간 : " + duration + "ms");
+        System.out.println("실패 횟수 :" + optimisticLockExceptionCount.get());
+        System.out.println("설정한 테스트 수 : " + threadCount + ", " + "전체 테스트 수: " + testedTotalCount);
+        System.out.println("성공적으로 완료된 작업 수: " + finalCount);
     }
 
 
@@ -208,10 +209,14 @@ class CardServiceTest {
 
         // 스레드 작업이 완료될 때까지 대기하게 하는 역할 -> 각 스레드가 작업을 완료할때마다 latch.countDown() 메서드 호출하여 카운트 감소시킨다.
         CountDownLatch latch = new CountDownLatch(threadCount);
+        long startTime = System.currentTimeMillis();
+
 
 
         // 예외 발생 횟수 추적하기 위한 변수
         AtomicInteger successfulCount = new AtomicInteger(0);
+        AtomicInteger failureCount = new AtomicInteger(0);
+
 
         for (int i = 0; i < threadCount; i++) {
             System.out.println(i);
@@ -220,7 +225,7 @@ class CardServiceTest {
                     cardService.incrementCount(cardId);
                     successfulCount.incrementAndGet();
                 }catch (Exception e) {
-                    System.out.println("예외 발생: " + e.getMessage());
+                    failureCount.incrementAndGet();
                 } finally {
                     latch.countDown(); // 모든 스레드 동시에 시작
                 }
@@ -232,9 +237,12 @@ class CardServiceTest {
         executorService.shutdown(); // 스레드가 모두 호출되면 종료
 
         int finalCount = cardRepository.findByCardId(cardId).orElseThrow(()-> new IllegalArgumentException("card not found")).getCount();
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
 
 
-        System.out.println("최종 카운트: " + finalCount);
+        System.out.println("실행 시간 : "  + duration + "ms");
+        System.out.println("실패 횟수 : " + failureCount.get());
         System.out.println("성공한 업데이트 수: " + successfulCount.get());
 
         // 락을 사용하지 않았기 때문에 동시성 문제가 발생할 수 있으며, 성공한 업데이트 수와 count 값이 다를 수 있음
