@@ -9,13 +9,11 @@ import com.sparta.newneoboardbuddy.domain.auth.dto.response.SigninResponse;
 import com.sparta.newneoboardbuddy.domain.auth.dto.response.SignupResponse;
 import com.sparta.newneoboardbuddy.domain.auth.dto.response.WithdrawResponse;
 import com.sparta.newneoboardbuddy.domain.auth.service.AuthService;
+import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,5 +50,10 @@ public class AuthController {
     @DeleteMapping("/auth/withdraw")
     public WithdrawResponse withdraw(@AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody WithdrawRequest withdrawRequest) {
         return authService.withdraw(authUser, withdrawRequest);
+    }
+
+    @GetMapping("/myinfo")
+    public SignupResponse myinfo(@AuthenticationPrincipal AuthUser authUser) {
+        return new SignupResponse(User.fromAuthUser(authUser));
     }
 }

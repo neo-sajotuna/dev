@@ -11,9 +11,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name="Card", indexes = @Index(name = "card_titles", columnList = "cardTitle"))
-// @Table(name="Card")
+//@Table(name="Card")
 @NoArgsConstructor
 public class Card {
 
