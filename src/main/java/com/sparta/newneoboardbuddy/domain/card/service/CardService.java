@@ -161,9 +161,9 @@ public class CardService {
 
         // 낙관적 락 적용
         Card updateCard = cardRepository.save(card);
-            logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
-                    ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
-                    ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
+        logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
+                ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
+                ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
 
         LocalTime latestActiveTime = cardActivityLogRepository.findFirstByCard_CardIdOrderByActiveTimeDesc(updateCard.getCardId())
                 .map(CardActivityLog::getActiveTime) // CardActivityLog에서 activeTime 값만 추출
@@ -178,7 +178,7 @@ public class CardService {
     public void incrementCount(Long cardId){
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("카드 없다"));
-        // card.setCount(card.getCount() + 1);
+        card.addTestCount();
         cardRepository.save(card);
     }
 
