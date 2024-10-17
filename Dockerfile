@@ -3,16 +3,16 @@ LABEL authors="sunsunmacbook"
 
 ENTRYPOINT ["top", "-b"]
 
-#!/bin/bash
+# 1단계: 빌드 이미지를 사용하여 JAR 파일을 생성
+FROM gradle:7.3.3-jdk17 AS builder
+WORKDIR /home/app
+COPY . .
+RUN gradle clean build --no-daemon
 
-# base 이미지 설정
+# 2단계: 실제 애플리케이션 실행을 위한 이미지
 FROM openjdk:17-jdk-slim
-
-# jar 파일을 컨테이너 내부에 복사
-COPY build/libs/*.jar app.jar
-
-# 외부 호스트 8080 포트로 노출
-EXPOSE 3306
-
-# 실행 명령어
-CMD ["java", "-jar", "app.jar"]
+WORKDIR /app
+# 빌드된 JAR 파일을 복사
+COPY --from=builder /home/app/build/libs/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
