@@ -23,6 +23,11 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * 해당 타이틀을 가진 Card 객체들을 반환하는 메서드
+     * @param title 조회할 Title 내용
+     * @return 해당 타이틀을 가진 Card List
+     */
     public List<Card> findByCardTitle(String title) {
         QCard card = QCard.card;
 
@@ -31,23 +36,19 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
                 .fetch();
     }
 
-    public Page<Card> searchCards(Long userId, Pageable pageable) {
-        QCard card = QCard.card;
-
-        List<Card> cards = queryFactory.selectFrom(card)
-                .where(card.user.id.eq(userId))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        return new PageImpl<>(cards, pageable, cards.size());
-    }
-
+    /**
+     * Null이 아닌 조건 내용 모두 포함하고 있는 카드들을 페이징하여 반환하는 메서드
+     * @param cardTitle Card.title에 cardTitle의 내용이 들어 있는지 확인할 문자열
+     * @param cardContent Card.content에 cardContent의 내용이 들어 있는지 확인할 문자열
+     * @param assignedMemberId Card.userId에 assignedMemberId와 일치 여부를 확인할 Card와 동일한 Space에 소속인 UserId
+     * @param boardId Card.board.boardId와 일치 여부를 확인할 boardId
+     * @param pageable 페이징 조건
+     * @return Null이 아닌 조건 모두 만족하는 페이징 된 카드
+     */
     @Override
     public Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId , Long boardId, Pageable pageable){
 
         QCard card = QCard.card;
-
 
         BooleanBuilder builder = new BooleanBuilder();
 
