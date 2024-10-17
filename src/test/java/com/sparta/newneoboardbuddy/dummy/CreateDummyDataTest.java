@@ -1,10 +1,22 @@
 package com.sparta.newneoboardbuddy.dummy;
 
 import com.sparta.newneoboardbuddy.config.SlackNotificationUtil;
+import com.sparta.newneoboardbuddy.domain.board.entity.Board;
+import com.sparta.newneoboardbuddy.domain.card.entity.Card;
+import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
+import com.sparta.newneoboardbuddy.domain.member.entity.Member;
+import com.sparta.newneoboardbuddy.domain.user.entity.User;
+import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.dummy.config.DataHub;
 import com.sparta.newneoboardbuddy.dummy.config.DummyDataFactory;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class CreateDummyDataTest {
@@ -33,7 +45,7 @@ public class CreateDummyDataTest {
 //        int workspaceSize = 10;
 //        int boardSize = 10;
 //        int boardListSize = 10;
-//        int cardSize = 10;
+//        int cardSize = 250000;
 //
 //        List<User> users = dummyDataFactory.createDummyUser(userSize);
 //        List<Member> members = new ArrayList<Member>();
@@ -42,11 +54,9 @@ public class CreateDummyDataTest {
 //        List<Board> boards = dummyDataFactory.createDummyBoard(boardSize, workspaces);
 //        List<BoardList> boardLists = dummyDataFactory.createDummyBoardList(boardListSize, boards);
 //        boardLists = dummyDataFactory.getBoardListsFetchJoin();
-//        List<Card> cards = dummyDataFactory.createDummyCard(cardSize, members, workspaces, boardLists);
-//
-//        assertEquals(cards.size(), cardSize);
+//        List<Card> cards = dummyDataFactory.createDummyCard(cardSize / 2, members, workspaces, boardLists);
 //    }
-
+//
 //    @Test
 //    void createDummyUsers() {
 //        int userSize = 10;
@@ -68,6 +78,7 @@ public class CreateDummyDataTest {
 //        assertEquals(savedMembers.size(), members.size());
 //    }
 //
+//    @Test
 //    void createDummyBoards() {
 //        int boardSize = 10;
 //        List<Workspace> workspaces = datahub.getAllWorkspaces();
@@ -76,6 +87,7 @@ public class CreateDummyDataTest {
 //        assertEquals(boards.size(), boardSize);
 //    }
 //
+//    @Test
 //    void createBoardList() {
 //        int boardListSize = 10;
 //
@@ -87,7 +99,7 @@ public class CreateDummyDataTest {
 //
 //    @Test
 //    void createDummyCards() {
-//        int cardSize = 25;
+//        int cardSize = 125000;
 //        List<Workspace> workspaces = datahub.getAllWorkspaces();
 //        List<Board> boards = datahub.getAllBoards();
 //        List<BoardList> boardLists = dummyDataFactory.getBoardListsFetchJoin();
