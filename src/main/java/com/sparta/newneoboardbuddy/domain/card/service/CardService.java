@@ -4,6 +4,7 @@ import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.common.exception.CommonOptimisticLockingFailureException;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
+import com.sparta.newneoboardbuddy.common.service.RedisService;
 import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.board.exception.BoardNotFoundException;
@@ -59,6 +60,7 @@ public class CardService {
     private final FileService fileService;
 
     private final WorkspaceRepository workspaceRepository;
+    private final RedisService redisService;
 
     private final HierarchyUtil hierarchyUtil;
 
@@ -201,12 +203,15 @@ public class CardService {
     }
 
     @Transactional(readOnly = true)
-    public CardDetailResponse getCardDetails(Long cardId) {
+    public CardDetailResponse getCardDetails(AuthUser authUser, Long cardId) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(()-> new NotFoundException("카드가 없다."));
 
         // 카드 활동 내역 조회
         List<CardActivityLog> activityLogs = cardActivityLogRepository.findByCard(card);
+
+        // 카드 조회 시 조회카운트
+        redisService.incrementCardView("card", cardId, authUser.getId());
 
         // 카드 댓글 조회
         List<Comment> comments = card.getComments();

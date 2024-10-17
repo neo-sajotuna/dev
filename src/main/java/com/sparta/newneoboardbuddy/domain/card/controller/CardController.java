@@ -42,8 +42,8 @@ public class CardController {
     }
 
     @GetMapping("/cards/{cardId}")
-    public ResponseEntity<CardDetailResponse> getCard(@PathVariable Long cardId){
-        return ResponseEntity.ok(cardService.getCardDetails(cardId));
+    public ResponseEntity<CardDetailResponse> getCard(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long cardId){
+        return ResponseEntity.ok(cardService.getCardDetails(authUser, cardId));
     }
 
     @DeleteMapping("/cards/{cardId}")
