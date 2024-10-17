@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class GetWorkspaceResponse {
-
     private Long spaceId;
     private String spaceName;
     private String content;

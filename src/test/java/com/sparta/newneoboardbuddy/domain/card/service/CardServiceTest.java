@@ -1,58 +1,37 @@
 package com.sparta.newneoboardbuddy.domain.card.service;
 
-import com.amazonaws.services.kms.model.InvalidAliasNameException;
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.common.exception.CommonOptimisticLockingFailureException;
-import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
-import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardRequest;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.board.repository.BoardRepository;
 import com.sparta.newneoboardbuddy.domain.card.dto.request.CardCreateRequest;
-import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
-import com.sparta.newneoboardbuddy.domain.cardActivityLog.repository.CardActivityLogRepository;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
-import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import com.sparta.newneoboardbuddy.domain.user.repository.UserRepository;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.repository.WorkspaceRepository;
-import jdk.swing.interop.SwingInterOpUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.spy;
 
 
 @SpringBootTest

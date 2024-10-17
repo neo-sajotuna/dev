@@ -1,5 +1,8 @@
 package com.sparta.newneoboardbuddy.domain.auth.service;
 
+import com.sparta.newneoboardbuddy.common.dto.AuthUser;
+import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
+import com.sparta.newneoboardbuddy.config.JwtUtil;
 import com.sparta.newneoboardbuddy.config.SlackNotificationUtil;
 import com.sparta.newneoboardbuddy.domain.auth.dto.request.SigninRequest;
 import com.sparta.newneoboardbuddy.domain.auth.dto.request.SignupRequest;
@@ -8,9 +11,6 @@ import com.sparta.newneoboardbuddy.domain.auth.dto.response.SigninResponse;
 import com.sparta.newneoboardbuddy.domain.auth.dto.response.SignupResponse;
 import com.sparta.newneoboardbuddy.domain.auth.dto.response.WithdrawResponse;
 import com.sparta.newneoboardbuddy.domain.auth.exception.AuthException;
-import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
-import com.sparta.newneoboardbuddy.config.JwtUtil;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
 import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import com.sparta.newneoboardbuddy.domain.user.repository.UserRepository;
@@ -23,12 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SlackNotificationUtil slackNotificationUtil;
     private final JwtUtil jwtUtil;
 
+    /**
+     * 회원가입 처리 할 메서드
+     * @param signupRequest 회원가입에 필요한 정보가 담긴 Request
+     * @return 회원가입된 유저 정보가 담긴 Dto
+     */
     @Transactional
     public SignupResponse signup(SignupRequest signupRequest) {
 
@@ -52,6 +56,11 @@ public class AuthService {
         return new SignupResponse(savedUser);
     }
 
+    /**
+     * 로그인 처리하는 메서드
+     * @param signinRequest 로그인에 필요한 유저 정보가 담긴 Request
+     * @return 로그인된 유저 정보가 담긴 Dto객체
+     */
     @Transactional
     public SigninResponse signin(SigninRequest signinRequest) {
         User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(
@@ -67,6 +76,12 @@ public class AuthService {
         return new SigninResponse(bearerToken);
     }
 
+    /**
+     * 회원 탈퇴 처리하는 메서드
+     * @param authUser Filter에서 인증된 유저 정보
+     * @param withdrawRequest 회원 탈퇴에 필요한 비밀번호가 담긴 Request
+     * @return 삭제된 User Id가 담긴 Dto객체
+     */
     @Transactional
     public WithdrawResponse withdraw(AuthUser authUser, WithdrawRequest withdrawRequest) {
         User user = userRepository.findByEmail(authUser.getEmail()).orElseThrow(

@@ -7,6 +7,5 @@ import lombok.Getter;
 public class InviteMemberRequest {
     private String email;
     private MemberRole memberRole;
-
 }
 

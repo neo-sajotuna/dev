@@ -1,6 +1,5 @@
 package com.sparta.newneoboardbuddy.domain.card.dto.request;
 
-import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

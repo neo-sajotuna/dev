@@ -6,8 +6,8 @@ import com.sparta.newneoboardbuddy.config.SlackNotificationUtil;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.exception.CardNotFoundException;
 import com.sparta.newneoboardbuddy.domain.card.repository.CardRepository;
-import com.sparta.newneoboardbuddy.domain.comment.dto.request.CommentUpdateRequestDto;
 import com.sparta.newneoboardbuddy.domain.comment.dto.request.CommentSaveRequestDto;
+import com.sparta.newneoboardbuddy.domain.comment.dto.request.CommentUpdateRequestDto;
 import com.sparta.newneoboardbuddy.domain.comment.dto.response.CommentSaveResponseDto;
 import com.sparta.newneoboardbuddy.domain.comment.dto.response.CommentUpdateResponseDto;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
@@ -35,6 +35,12 @@ public class CommentService {
 
     private final SlackNotificationUtil slackNotificationUtil;
 
+    /**
+     * 댓글을 작성하는 메서드
+     * @param authUser Filter에서 인증된 User정보
+     * @param commentSaveRequestDto 댓글 작성에 필요한 정보가 담긴 Dto
+     * @return 작성된 댓글 정보가 담긴 Dto
+     */
     @Transactional
     public CommentSaveResponseDto saveComment(AuthUser authUser, CommentSaveRequestDto commentSaveRequestDto) {
 
@@ -77,6 +83,13 @@ public class CommentService {
 
     }
 
+    /**
+     * commandId에 해당하는 댓글을 수정하는 메서드
+     * @param authUser Filter에서 인증된 유저 정보
+     * @param commentId 수정할 댓글 Id
+     * @param commentUpdateRequestDto 댓글 수정에 필요한 정보가 담긴 Dto
+     * @return 수정된 댓글 정보가 담긴 Dto
+     */
     @Transactional
     public CommentUpdateResponseDto updateComment(AuthUser authUser, Long commentId, CommentUpdateRequestDto commentUpdateRequestDto) {
 
@@ -108,6 +121,11 @@ public class CommentService {
 
     }
 
+    /**
+     * 댓글을 삭제하는 메서드
+     * @param authUser Filter에서 인증된 유저 정보
+     * @param commentId 삭제할 댓글 Id
+     */
     @Transactional
     public void deleteComment(AuthUser authUser, Long commentId) {
 
@@ -128,21 +146,33 @@ public class CommentService {
         }
     }
 
-    // commentid 로 comment 가 있는지 확인
+    /**
+     * 해당 Id를 가진 댓글이 존재하는지 조회 후 반환하는 메서드
+     * @param commentId 조회할 댓글 Id
+     * @return 해당 댓글 Id를 가진 Comment 객체
+     */
     private Comment getCommentById(Long commentId){
         return commentRepository.findByCommentId(commentId).orElseThrow(
                 () -> new CommentNotFoundException(HttpStatus.BAD_REQUEST)
         );
     }
 
-    // cardId 로 card 가 있는지 확인
+    /**
+     * 해당 CardId를 가진 Card가 존재하는지 조회 후 반환하는 메서드
+     * @param cardId 조회할 카드 Id
+     * @return 해당 Id를 가진 Card객체
+     */
     private Card getCardById(Long cardId){
         return cardRepository.findByCardId(cardId).orElseThrow(
                 () -> new CardNotFoundException(HttpStatus.BAD_REQUEST)
         );
     }
 
-    // 자기가 쓴글을 수정하려는지 확인
+    /**
+     * 현재 로그인 중인 유저가, 댓글 작성자인지 확인하는 메서드
+     * @param authUserId 로그인 중인 유저 Id
+     * @param userId 댓글을 작성한 유저 Id
+     */
     private void checkWriter(Long authUserId, Long userId){
         if(!authUserId.equals(userId)){
             throw new NotAuthorException(HttpStatus.BAD_REQUEST);

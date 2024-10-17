@@ -1,8 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.workspace.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardRequest;
-import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardResponse;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;
@@ -35,7 +33,12 @@ public class WorkspaceService {
     private final MemberRepository memberRepository;
     private final UserRepository userRepository;
 
-    // 워크스페이스 생성
+    /**
+     * 워크 스페이스를 생성하는 메서드
+     * @param authUser Filter에서 인증 완료된 유저
+     * @param workspaceRequest 워크 스페이스 생성에 필요한 workspace이름, 설명이 담긴 Request
+     * @return 생성된 Workspace 정보가 담긴 Dto 객체
+     */
     @Transactional
     public WorkspaceResponse createWorkspace(AuthUser authUser, WorkspaceRequest workspaceRequest) {
         User user = User.fromAuthUser(authUser);
@@ -56,7 +59,12 @@ public class WorkspaceService {
 
     }
 
-    // 워크스페이스 멤버 초대
+    /**
+     * 워크 스페이스에 유저를 초대하는 메서드
+     * @param authUser Filter에서 인증 완료된 유저
+     * @param spaceId 해당 유저를 추가할 Workspace Id
+     * @param inviteMemberRequest 유저 추가에 필요한 Email과 권한 내용이 담긴 Request
+     */
     @Transactional
     public void inviteMember(AuthUser authUser, Long spaceId, InviteMemberRequest inviteMemberRequest) {
         User user = User.fromAuthUser(authUser);
@@ -88,7 +96,13 @@ public class WorkspaceService {
 
     }
 
-    // 워크스페이스 목록 조회
+    /**
+     * 해당 유저가 가입되어 있는 워크 스페이스 목록을 페이징하여 조회하는 메서드
+     * @param page 조회할 페이지
+     * @param size 페이지당 크기
+     * @param authUser Filter에서 인증 완료된 유저
+     * @return 페이징된 해당 유저가 가입되어 있는 워크 스페이스 목록
+     */
     @Transactional
     public Page<GetWorkspaceResponse> getWorkspace(int page, int size, AuthUser authUser) {
         Pageable pageable = PageRequest.of(page-1, size);
@@ -102,8 +116,13 @@ public class WorkspaceService {
 
     }
 
-
-    // 워크스페이스 수정
+    /**
+     * space Id에 해당하는 workspace를 갱신 / 수정하는 메서드
+     * @param authUser Filter에서 인증 완료된 유저
+     * @param spaceId 수정할 대상의 space Id
+     * @param workspaceRequest workspace 수정에 필요한 스페이스 제목, 설명이 담긴 Request
+     * @return 갱신된 Workspace 정보가 담긴 Dto 객체
+     */
     @Transactional
     public UpdateWorkspaceResponse updateWorkspace(AuthUser authUser, Long spaceId, WorkspaceRequest workspaceRequest) {
         User user = User.fromUser(authUser);
@@ -125,8 +144,11 @@ public class WorkspaceService {
 
     }
 
-
-    // 워크스페이스 삭제
+    /**
+     * 해당 인증된 유저가 속해있는 workspace를 삭제하는 메서드
+     * @param authUser Filter에서 인증 완료된 유저
+     * @param spaceId 삭제할 대상의 space Id
+     */
     @Transactional
     public void deleteWorkspace(AuthUser authUser, Long spaceId) {
         User user = User.fromUser(authUser);
@@ -144,8 +166,6 @@ public class WorkspaceService {
         }
 
         workspaceRepository.delete(workspace);
-
     }
-
 }
 

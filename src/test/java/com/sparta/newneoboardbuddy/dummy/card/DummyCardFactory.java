@@ -1,7 +1,6 @@
 package com.sparta.newneoboardbuddy.dummy.card;
 
 import com.github.javafaker.Faker;
-import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardRequest;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;

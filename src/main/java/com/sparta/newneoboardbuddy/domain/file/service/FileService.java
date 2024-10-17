@@ -60,6 +60,10 @@ public class FileService {
     // 파일 사이즈 제한
     private final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
+    /**
+     * AWS에 File을 업로드 하는 메서드
+     * @param fileUploadDto 파일 업로드에 필요한 Dto
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void uploadFile(FileUploadDto fileUploadDto) {
 
@@ -96,6 +100,11 @@ public class FileService {
 
     }
 
+    /**
+     * AWS에서 파일을 삭제하는 메서드
+     * @param authUser Filter에서 인증된 유저 정보
+     * @param fileDeleteDto 파일 삭제에 필요한 정보가 담긴 Dto
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteFile(AuthUser authUser, FileDeleteDto fileDeleteDto) {
 
@@ -116,19 +125,34 @@ public class FileService {
 
     }
 
+    /**
+     * 해당 targetTable과 targetId의 정보를 통해, 서버에 저장된 파일의 URL을 반환하는 메서드
+     * @param targetId 연관된 테이블의 레코드 Id
+     * @param targetTable 연관된 table 이름
+     * @return 서버에 저장된 파일 URL
+     */
     public String getFile(Long targetId, String targetTable) {
         S3File s3File = findS3File(targetId, targetTable);
         return s3File.getFileUrl();
     }
 
-
+    /**
+     * 해당 targetTable에 속한 targetId를 가진 파일이 있을 경우, 해당 파일에 관련된 정보를 반환하는 메서드
+     * @param targetId 연관된 테이블의 레코드 Id
+     * @param targetTable 연관된 table 이름
+     * @return 해당 파일에 관련된 정보가 담긴 S3File 객체
+     */
     private S3File findS3File(Long targetId, String targetTable) {
         return s3FileRepository.findByTargetIdAndAndTargetTable(targetId, targetTable).orElseThrow(
                 () -> new NotFoundFileException(HttpStatus.BAD_REQUEST)
         );
     }
 
-    //원래 파일명에서 확장자 뽑기
+    /**
+     * 파일의 확장자를 추출하여 반환하는 메서드
+     * @param originalFilename 전체 파일 명
+     * @return 파일의 .을 제외한 확장자 ( ex, note.txt -> txt )
+     */
     private String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
