@@ -17,8 +17,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Page<Member> findAllByUser(User user, Pageable pageable);
 
+    /**
+     * Member Table에서 user Id를 갖고 있는 Workspace 소속 유저를 workspace fetch Join한 상태로 반환하는 메서드
+     * @param userId 찾고자 하는 user Id
+     * @param workspaceId 소속을 확인할 workspace Id
+     * @return userId를 갖고 있는 workspace fetch 상태의 member객체
+     */
     @Query("select m from Member m join fetch m.workspace w  " +
             "where m.user.id = :userId AND m.workspace.spaceId = :workspaceId")
     Optional<Member> findByUserIdWithJoinFetchWorkspace(Long userId, Long workspaceId);
-
 }

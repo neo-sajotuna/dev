@@ -21,7 +21,15 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final WorkspaceRepository workspaceRepository;
 
-
+    /**
+     * 다음 조건을 만족하는 로그인된 유저와 관련되어 있는 Member 객체를 반환하는 메서드
+     *  1. Workspace Id를 갖고 있는 Workspace에 속해 있어야 한다.
+     *  2. 해당 멤버는 읽기 전용이 아닌 다른 권한을 갖고 있어야 한다.
+     *
+     * @param authUser Filter에서 인증이 완료된 유저 정보
+     * @param workspaceId 해당 유저가 속해 있는지 확인할 workSpace Id
+     * @return 조건을 만족하는 유저와 관련된 Member 객체
+     */
     public Member verifyMember(AuthUser authUser, Long workspaceId) {
         User user = User.fromUser(authUser);
 
@@ -39,6 +47,12 @@ public class MemberService {
         return member;
     }
 
+    /**
+     * 해당 workspace에 속한 user와 관련된 Member 객체를 workspace까지 fetch Join 한 상태로 반환하는 메서드
+     * @param authUser Filter에서 인증이 완료된 유저 정보
+     * @param workspaceId 해당 유저가 속해 있는지 확인할 workSpace Id
+     * @return Workspace까지 fetch Join 한 상태의 Member 객체
+     */
     public Member memberInWorkspaceFetchWorkspace(AuthUser authUser, Long workspaceId) {
         User user = User.fromUser(authUser);
 

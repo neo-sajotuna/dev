@@ -1,6 +1,5 @@
 package com.sparta.newneoboardbuddy.domain.comment.repository;
 
-import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.comment.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
