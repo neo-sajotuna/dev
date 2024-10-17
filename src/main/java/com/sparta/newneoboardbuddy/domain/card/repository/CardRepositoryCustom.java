@@ -9,11 +9,9 @@ import java.util.List;
 public interface CardRepositoryCustom {
 
     Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable);
-
     Page<Card> searchCards(Long userId, Pageable pageable);
 
     List<Card> findByCardTitle(String title);
     // 비관적 락
     Card findCardWithLock(Long caredId);
-
 }
