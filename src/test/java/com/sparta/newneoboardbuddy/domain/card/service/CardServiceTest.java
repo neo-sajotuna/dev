@@ -118,7 +118,7 @@ class CardServiceTest {
         Long cardId= cardCreateResponse.getCardId();
 
         int threadCount = 100;
-        ExecutorService executorService = Executors.newFixedThreadPool(30); // 낙관적 락킹 적용할 스레드풀 설정 -> 동시에 최대 10개의 스레드가 실행 +  스레드가 완료되면 그 자리를 다른 스레드가 사용
+        ExecutorService executorService = Executors.newFixedThreadPool(0); // 낙관적 락킹 적용할 스레드풀 설정 -> 동시에 최대 10개의 스레드가 실행 +  스레드가 완료되면 그 자리를 다른 스레드가 사용
 
 
 
