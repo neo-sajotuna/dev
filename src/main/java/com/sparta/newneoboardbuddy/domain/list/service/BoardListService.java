@@ -138,7 +138,7 @@ public class BoardListService {
         BoardList boardList = boardListRepository.findByIdWithJoinFetchToWorkspace(boardlistId)
                 .orElseThrow(()-> new NoSuchElementException("존재하지 않는 List입니다."));
 
-        if (hierarchyUtil.isListInWorkspace(workspaceId, boardList)) {
+        if (!hierarchyUtil.isListInWorkspace(workspaceId, boardList)) {
             throw new IllegalArgumentException("Workspace에 존재하지 않는 List입니다");
         }
 
