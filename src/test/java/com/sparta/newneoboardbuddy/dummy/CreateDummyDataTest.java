@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
 public class CreateDummyDataTest {
     @Autowired
@@ -56,12 +59,16 @@ public class CreateDummyDataTest {
         List<BoardList> boardLists = dummyDataFactory.createDummyBoardList(boardListSize, boards);
         boardLists = dummyDataFactory.getBoardListsFetchJoin();
         List<Card> cards = dummyDataFactory.createDummyCard(cardSize, members, workspaces, boardLists);
+
+        assertEquals(cards.size(), cardSize);
     }
 
     @Test
     void createDummyUsers() {
         int userSize = 10;
         List<User> users = dummyDataFactory.createDummyUser(userSize);
+
+        assertEquals(users.size(), userSize);
     }
 
     @Test
@@ -71,13 +78,18 @@ public class CreateDummyDataTest {
         List<Member> members = new ArrayList<Member>();
 
         List<Workspace> workspaces = dummyDataFactory.createDummyWorkspaces(workspaceSize, users, members);
-        dummyDataFactory.saveMembers(members);
+        List<Member> savedMembers = dummyDataFactory.saveMembers(members);
+
+        assertEquals(workspaces.size(), workspaceSize);
+        assertEquals(savedMembers.size(), members.size());
     }
 
     void createDummyBoards() {
         int boardSize = 10;
         List<Workspace> workspaces = datahub.getAllWorkspaces();
         List<Board> boards = dummyDataFactory.createDummyBoard(boardSize, workspaces);
+
+        assertEquals(boards.size(), boardSize);
     }
 
     void createBoardList() {
@@ -85,6 +97,8 @@ public class CreateDummyDataTest {
 
         List<Board> boards = datahub.getAllBoards();
         List<BoardList> boardLists = dummyDataFactory.createDummyBoardList(boardListSize, boards);
+
+        assertEquals(boardLists.size(), boardListSize);
     }
 
     @Test
@@ -96,6 +110,8 @@ public class CreateDummyDataTest {
         List<Member> members = datahub.getAllMembers();
 
         List<Card> cards = dummyDataFactory.createDummyCard(cardSize, members, workspaces, boardLists);
+
+        assertEquals(cards.size(), cardSize);
     }
 
 }
