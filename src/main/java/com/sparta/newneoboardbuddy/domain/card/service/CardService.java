@@ -126,10 +126,7 @@ public class CardService {
 
 
     public CardUpdateResponse updateCard(Long cardId, AuthUser authUser, CardUpdateRequest request) {
-//        Card card = cardRepository.findById(cardId).orElseThrow(()->
-//                new NoSuchElementException("카드를 찾을 수 없다."));
-
-        // 카드 추가될 리스트 조회
+        // 카드 추가될 리스트  (낙관적 락)
         Card card = cardRepository.findByIdWithJoinFetchToWorkspace(cardId).orElseThrow(() ->
                 new InvalidRequestException("card not found"));
 
@@ -163,7 +160,7 @@ public class CardService {
 
 
         // 낙관적 락 적용
-            Card updateCard = cardRepository.save(card);
+        Card updateCard = cardRepository.save(card);
             logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
                     ", 내용 : " + oldContent + " -> " + updateCard.getCardContent() +
                     ", 관리 멤버 :" + " -> " + updateCard.getMember().getMemberId());
@@ -182,16 +179,6 @@ public class CardService {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("카드 없다"));
         // card.setCount(card.getCount() + 1);
-        cardRepository.save(card);
-    }
-
-    // 비관적 락 사용
-    public void updateCardWithLock(Long cardId, CardUpdateRequest request) {
-        // 비관적 락 사용 시
-        Card card = cardRepository.findCardWithLock(cardId);
-        card.setCardTitle(request.getCardTitle());
-        card.setCardContent(request.getCardContent());
-
         cardRepository.save(card);
     }
 
