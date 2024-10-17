@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class WorkspaceRequest {
     private String spaceName;
     private String content;
-
 }

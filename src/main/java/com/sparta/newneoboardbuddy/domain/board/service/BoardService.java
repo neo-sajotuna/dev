@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.NoSuchElementException;
 
 @Service
@@ -37,7 +36,12 @@ public class BoardService {
     private final WorkspaceRepository workspaceRepository;
     private final MemberRepository memberRepository;
 
-    // 보드 생성
+    /**
+     * workspace에 board를 생성하는 메서드
+     * @param authUser Filter에서 인증된 유저 정보
+     * @param boardRequest Board생성에 필요한 정보가 담긴 Request
+     * @return 생성된 Board정보가 담긴 Dto
+     */
     @Transactional
     public BoardResponse createBoard(AuthUser authUser, BoardRequest boardRequest) {
         // 로그인하지 않은 멤버가 보드를 생성하려는 경우
@@ -71,7 +75,13 @@ public class BoardService {
     }
 
 
-    // 보드 수정
+    /**
+     * Board를 수정하는 메서드
+     * @param authUser Filter에서 인증된 User정보
+     * @param boardId 수정할 Board Id
+     * @param boardRequest Board수정에 필요한 Request
+     * @return 수정된 Board정보가 담긴 Dto객체
+     */
     @Transactional
     public BoardResponse updateBoard(AuthUser authUser, Long boardId, BoardRequest boardRequest) {
         // 로그인하지 않은 멤버가 보드를 생성하려는 경우
@@ -107,7 +117,13 @@ public class BoardService {
     }
 
 
-    // 보드 단건 조회
+    /**
+     * 해당 Board Id를 가진 Board를 조회하는 메서드
+     * @param authUser Filter에서 인증된 User정보
+     * @param spaceId 유저가 속해있는지 확인할 workspace ID
+     * @param boardId 조회할 BoardId
+     * @return 조회한 Board 정보가 담긴 Dto
+     */
     @Transactional
     public GetBoardResponse getBoard(AuthUser authUser,Long spaceId, Long boardId) {
         User user = User.fromAuthUser(authUser);
@@ -145,8 +161,12 @@ public class BoardService {
     }
 
 
-    // 보드 삭제
-    // 삭제 시 보드 내의 모든 리스트와 데이터도 삭제됩니다.
+    /**
+     * Board를 삭제하는 메서드
+     * @param authUser Filter에서 인증된 유저 정보
+     * @param spaceId 해당 Board와 User가 존재하는지 확인할 workspace Id
+     * @param boardId 삭제할 boardId
+     */
     @Transactional
     public void deleteBoard(AuthUser authUser,Long spaceId, Long boardId) {
         User user = User.fromAuthUser(authUser);
@@ -171,6 +191,11 @@ public class BoardService {
 
     }
 
+    /**
+     * 해당 boardId를 가진 Board를 workspace까지 fetch Join한 상태로 반환하는 메서드
+     * @param boardId 찾을 boardId
+     * @return 조회에 성공한 workspace까지 fetch Join된 상태의 Board
+     */
     public Board getBoardFetchJoinToWorkspace(Long boardId) {
         return boardRepository.findByBoardWithJoinFetchToWorkspace(boardId).orElseThrow(
                 ()->new NoSuchElementException("해당 보드가 존재하지 않습니다.")

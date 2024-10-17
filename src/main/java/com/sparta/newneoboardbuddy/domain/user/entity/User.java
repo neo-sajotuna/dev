@@ -11,7 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
-
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +40,6 @@ public class User {
         this.id = id;
     }
 
-
     public static User fromAuthUser(AuthUser authUser) {
         // SimpleGrantedAuthority에서 권한 문자열을 가져와서 UserRole로 변환
         String role = ((SimpleGrantedAuthority) authUser.getAuthorities().toArray()[0]).getAuthority();
@@ -52,13 +50,6 @@ public class User {
 
     public static User fromUser(AuthUser authUser) {
         return new User(authUser.getId());
-    }
-    public void changePassword(String password) {
-        this.password = password;
-    }
-
-    public void updateRole(UserRole userRole) {
-        this.userRole = userRole;
     }
 
     public void withdraw() { this.isActive = false; }

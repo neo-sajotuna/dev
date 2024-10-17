@@ -9,7 +9,6 @@ public class WorkspaceResponse {
     private String spaceName;
     private String content;
 
-
     public WorkspaceResponse(Workspace workspace) {
         this.spaceId = workspace.getSpaceId();
         this.spaceName = workspace.getSpaceName();

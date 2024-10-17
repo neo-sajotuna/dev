@@ -15,7 +15,6 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class Member {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
