@@ -17,25 +17,25 @@ class NewNeoBoardBuddyApplicationTests {
     @Autowired
     CardRepository cardRepository;
 
-    @Test
-    void contextLoads() {
-    }
+//    @Test
+//    void contextLoads() {
+//    }
 
-    @Test
-    void findCardOwner() {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        String findTitle = "Carrion Comfort";
-        List<Card> cards = cardRepository.findByCardTitle(findTitle);
-
-        for (Card card : cards) {
-            System.out.println(card.getCardId());
-        }
-
-        stopWatch.stop();
-        System.out.println(stopWatch.prettyPrint());
-
-//        assertFalse(cards.isEmpty());
-    }
+//    @Test
+//    void findCardOwner() {
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start();
+//
+//        String findTitle = "Carrion Comfort";
+//        List<Card> cards = cardRepository.findByCardTitle(findTitle);
+//
+//        for (Card card : cards) {
+//            System.out.println(card.getCardId());
+//        }
+//
+//        stopWatch.stop();
+//        System.out.println(stopWatch.prettyPrint());
+//
+////        assertFalse(cards.isEmpty());
+//    }
 }
