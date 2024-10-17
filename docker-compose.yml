@@ -3,7 +3,9 @@ services:
     image: mysql
     container_name: newneo-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./config/:/docker-entrypoint-initdb.d/
     ports:
       - "3306:3306"
     platform: linux/arm64

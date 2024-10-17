@@ -1,0 +1,2 @@
+CREATE SCHEMA IF NOT EXISTS NewNeo_BoardBuddy;
+CREATE SCHEMA IF NOT EXISTS NewNeo_BoardBuddy_test;
