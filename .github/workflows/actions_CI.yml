@@ -46,6 +46,13 @@ jobs:
           gradle-version: wrapper
           arguments: test --no-daemon
 
+      # Gradle 빌드 실행 및 JAR 파일 생성
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@main
+        with:
+          gradle-version: wrapper
+          arguments: clean build --no-daemon
+
       # 도커허브에 로그인
       - name: Login to DockerHub
         uses: docker/login-action@v1
