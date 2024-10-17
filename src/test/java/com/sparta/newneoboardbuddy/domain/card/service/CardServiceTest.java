@@ -166,7 +166,6 @@ class CardServiceTest {
     }
 
 
-
     @Test
     void updatedCard_락_사용_안했을때() throws InterruptedException {
         // given
