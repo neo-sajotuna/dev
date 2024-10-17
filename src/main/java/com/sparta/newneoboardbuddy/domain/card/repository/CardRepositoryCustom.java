@@ -12,6 +12,4 @@ public interface CardRepositoryCustom {
     Page<Card> searchCards(Long userId, Pageable pageable);
 
     List<Card> findByCardTitle(String title);
-    // 비관적 락
-    Card findCardWithLock(Long caredId);
 }
