@@ -31,7 +31,7 @@ jobs:
             docker rm sunchoii/neo || true
 
             # 최신 Docker 이미지 Pull
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/neo:latest
+            docker pull sunchoii/neo:latest
 
             # 새로운 컨테이너 실행
-            docker run -d -p 80:8080 --name sunchoii/neo ${{ secrets.DOCKERHUB_USERNAME }}/neo:latest
+            docker run -d -p 80:8080 --name neo sunchoii/neo:latest
