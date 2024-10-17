@@ -36,7 +36,8 @@ jobs:
       - name: Set up MySQL
         run: |
           sudo /etc/init.d/mysql start
-          mysql -e 'CREATE DATABASE NewNeo_BoardBuddy_test;' -uroot -proot
+          mysql -e 'CREATE DATABASE NewNeo_BoardBuddy_test;' -uroot -p${{ secrets.DB_PASSWORD }}
+
 
       # run은 사용자 지정 스크립트 실행 Gradle을 clean 하고 test 하겠다
       - name: run unittest
@@ -59,4 +60,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.SERVICE }}:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/neo:latest
