@@ -15,10 +15,8 @@ import com.sparta.newneoboardbuddy.domain.list.repository.BoardListRepository;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.service.MemberService;
-import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.domain.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

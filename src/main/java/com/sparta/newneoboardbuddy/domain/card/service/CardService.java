@@ -197,6 +197,8 @@ public class CardService {
 
     @Transactional(readOnly = true)
     public CardDetailResponse getCardDetails(AuthUser authUser, Long cardId) {
+
+//        System.out.println(1);
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(()-> new NotFoundException("카드가 없다."));
 
@@ -217,6 +219,8 @@ public class CardService {
                         comment.getEmoji(),
                         comment.getCreatedAt()))
                 .toList();
+
+        System.out.println(1);
 
         return new CardDetailResponse(
                 card.getCardId(),

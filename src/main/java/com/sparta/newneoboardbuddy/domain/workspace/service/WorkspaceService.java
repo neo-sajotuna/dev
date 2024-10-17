@@ -1,8 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.workspace.service;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardRequest;
-import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardResponse;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.member.rpository.MemberRepository;

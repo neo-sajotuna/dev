@@ -5,7 +5,6 @@ import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Getter

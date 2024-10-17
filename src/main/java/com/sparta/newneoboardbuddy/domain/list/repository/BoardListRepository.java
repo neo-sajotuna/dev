@@ -2,7 +2,6 @@ package com.sparta.newneoboardbuddy.domain.list.repository;
 
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
-import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

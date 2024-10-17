@@ -1,9 +1,7 @@
 package com.sparta.newneoboardbuddy.domain.workspace.dto.response;
 
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class WorkspaceResponse {

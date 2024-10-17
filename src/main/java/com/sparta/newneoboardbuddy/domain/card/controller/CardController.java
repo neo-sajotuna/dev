@@ -6,17 +6,14 @@ import com.sparta.newneoboardbuddy.domain.card.dto.request.CardUpdateRequest;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardCreateResponse;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardDetailResponse;
 import com.sparta.newneoboardbuddy.domain.card.dto.response.CardUpdateResponse;
-import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.card.service.CardService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor

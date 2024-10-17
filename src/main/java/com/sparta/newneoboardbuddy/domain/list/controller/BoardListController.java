@@ -1,7 +1,6 @@
 package com.sparta.newneoboardbuddy.domain.list.controller;
 
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
-import com.sparta.newneoboardbuddy.domain.board.service.BoardService;
 import com.sparta.newneoboardbuddy.domain.list.dto.request.BoardListDeleteRequest;
 import com.sparta.newneoboardbuddy.domain.list.dto.request.BoardListRequest;
 import com.sparta.newneoboardbuddy.domain.list.dto.request.BoardListUpdateRequest;
