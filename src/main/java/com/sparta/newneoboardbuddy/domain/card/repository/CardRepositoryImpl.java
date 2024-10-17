@@ -68,11 +68,4 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
         return new PageImpl<>(cards, pageable, total);
 
     }
-
-
-    // 비관적 락
-    @Override
-    public Card findCardWithLock(Long cardId){
-        return entityManager.find(Card.class, cardId, LockModeType.PESSIMISTIC_WRITE);
-    }
 }
