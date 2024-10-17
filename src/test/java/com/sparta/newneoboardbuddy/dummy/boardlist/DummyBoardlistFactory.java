@@ -3,10 +3,6 @@ package com.sparta.newneoboardbuddy.dummy.boardlist;
 import com.github.javafaker.Faker;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
-import com.sparta.newneoboardbuddy.domain.user.entity.User;
-import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

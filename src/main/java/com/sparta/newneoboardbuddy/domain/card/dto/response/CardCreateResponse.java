@@ -1,11 +1,9 @@
 package com.sparta.newneoboardbuddy.domain.card.dto.response;
 
 import com.sparta.newneoboardbuddy.domain.card.entity.Card;
-import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalTime;
 

@@ -25,6 +25,10 @@ public class SlackNotificationUtil {
         slack = Slack.getInstance();
     }
 
+    /**
+     * 유저가 가입 했을 때 User 정보를 payload로 만들어 Slack에 전송하는 메서드
+     * @param user 신규 가입된 유저
+     */
     public void sendNewUser(User user) {
         String payload = String.format(PAY_LOAD_HEAD +
                 "신규 가입 발생 : " +
@@ -36,6 +40,11 @@ public class SlackNotificationUtil {
         sendNotice(payload);
     }
 
+    /**
+     * 댓글이 작성 되엇을 때 댓글 정보와 작성자 정보를 payload로 만들어 Slack에 전송하는 메서드
+     * @param comment Comment 작성된 댓글
+     * @param user user 댓글 작성자
+     */
     public void sendNewComment(Comment comment, User user) {
         String payload = String.format(PAY_LOAD_HEAD +
                 "신규 댓글 발생 : " +

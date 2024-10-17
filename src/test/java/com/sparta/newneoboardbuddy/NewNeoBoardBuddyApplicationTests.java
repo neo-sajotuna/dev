@@ -9,8 +9,6 @@ import org.springframework.util.StopWatch;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 @SpringBootTest
 class NewNeoBoardBuddyApplicationTests {
 

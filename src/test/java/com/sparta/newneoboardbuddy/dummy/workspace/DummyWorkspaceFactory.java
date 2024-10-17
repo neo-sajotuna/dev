@@ -1,8 +1,6 @@
 package com.sparta.newneoboardbuddy.dummy.workspace;
 
 import com.github.javafaker.Faker;
-import com.sparta.newneoboardbuddy.domain.board.dto.request.BoardRequest;
-import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.member.enums.MemberRole;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
