@@ -178,7 +178,7 @@ public class CardService {
     public void incrementCount(Long cardId){
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("카드 없다"));
-        card.setCount(card.getCount() + 1);
+        // card.setCount(card.getCount() + 1);
         cardRepository.save(card);
     }
 
@@ -245,6 +245,9 @@ public class CardService {
 
     public Page<CardCreateResponse> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable) {
         return new PageImpl<>(cardRepository.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable).stream().map(CardCreateResponse::new).toList());
+    }
 
+    public Page<Card> searchCards(Long assignedMemberId, Pageable pageable) {
+        return cardRepository.searchCards(assignedMemberId, pageable);
     }
 }
