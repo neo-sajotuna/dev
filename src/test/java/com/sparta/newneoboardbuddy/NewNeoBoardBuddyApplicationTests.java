@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.StopWatch;
 
-import java.io.IOException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 class NewNeoBoardBuddyApplicationTests {
@@ -17,8 +18,7 @@ class NewNeoBoardBuddyApplicationTests {
     CardRepository cardRepository;
 
     @Test
-    void contextLoads() throws IOException {
-
+    void contextLoads() {
     }
 
     @Test
@@ -35,5 +35,7 @@ class NewNeoBoardBuddyApplicationTests {
 
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
+
+        assertFalse(cards.isEmpty());
     }
 }
