@@ -46,8 +46,8 @@ public class Card {
     @Column(name = "active_time")
     private LocalTime activeTime;
 
-//    @Version
-//    private Integer version; // 낙관적 락 버전 필드
+    @Version
+    private Integer version; // 낙관적 락 버전 필드
 
     private int count;
 
@@ -88,6 +88,10 @@ public class Card {
         this.boardList = list;
         this.board = board;
         this.workspace = workspace;
+    }
+
+    public void addTestCount() {
+        this.count++;
     }
 
 }
