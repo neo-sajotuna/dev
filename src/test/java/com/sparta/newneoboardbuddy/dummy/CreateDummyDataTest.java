@@ -1,26 +1,10 @@
 package com.sparta.newneoboardbuddy.dummy;
 
 import com.sparta.newneoboardbuddy.config.SlackNotificationUtil;
-import com.sparta.newneoboardbuddy.domain.board.entity.Board;
-import com.sparta.newneoboardbuddy.domain.card.entity.Card;
-import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
-import com.sparta.newneoboardbuddy.domain.member.entity.Member;
-import com.sparta.newneoboardbuddy.domain.user.entity.User;
-import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
-import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.dummy.config.DataHub;
 import com.sparta.newneoboardbuddy.dummy.config.DummyDataFactory;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 public class CreateDummyDataTest {
