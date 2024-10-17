@@ -181,7 +181,7 @@ public class CardService {
     public void incrementCount(Long cardId){
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("카드 없다"));
-        card.setCount(card.getCount() + 1);
+        // card.setCount(card.getCount() + 1);
         cardRepository.save(card);
     }
 
