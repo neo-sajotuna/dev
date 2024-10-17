@@ -51,9 +51,4 @@ public class AuthController {
     public WithdrawResponse withdraw(@AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody WithdrawRequest withdrawRequest) {
         return authService.withdraw(authUser, withdrawRequest);
     }
-
-    @GetMapping("/myinfo")
-    public SignupResponse myinfo(@AuthenticationPrincipal AuthUser authUser) {
-        return new SignupResponse(User.fromAuthUser(authUser));
-    }
 }
