@@ -22,11 +22,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          script: |
-            # Docker가 설치되어 있지 않다면 설치 (한 번만 필요)
-            sudo apt update
-            sudo apt install -y docker.io
-            
+          script: |   
             # Docker 서비스 시작
             sudo systemctl start docker
 
