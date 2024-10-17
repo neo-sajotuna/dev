@@ -27,11 +27,11 @@ jobs:
             sudo systemctl start docker
 
             # 기존 컨테이너 중지 및 삭제
-            docker stop sunchoii/neo || true
-            docker rm sunchoii/neo || true
+            docker stop neo || true
+            docker rm neo || true
 
             # 최신 Docker 이미지 Pull
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sunchoii/neo:latest
+            docker pull sunchoii/neo:latest
 
             # 새로운 컨테이너 실행
-            docker run -d -p 80:8080 --name sunchoii/neo ${{ secrets.DOCKERHUB_USERNAME }}/sunchoii/neo:latest
+            docker run -d -p 8080:8080 --name neo -e JWT_SECRET_KEY=${{secrets.JWT_SECRET_KEY}} -e CLOUD_AWS_CREDENTIALS_SECRETKEY=${{secrets.AWS_SECRET_KEY}} -e CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{secrets.AWS_ACCESS_KEY}} -e SLACK_WEBHOOK_URL=${{secrets.SLACK_URL}} sunchoii/neo:latest
