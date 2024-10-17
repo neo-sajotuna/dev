@@ -1,18 +1,11 @@
-FROM ubuntu:latest
-LABEL authors="sunsunmacbook"
+# 환경구성
+FROM azul/zulu-openjdk:17-latest
 
-ENTRYPOINT ["top", "-b"]
+# jar file 변수 설정
+ARG JAR_FILE=build/libs/*.jar
 
-#!/bin/bash
+# 빌드파일 복사
+COPY ${JAR_FILE} app.jar
 
-# base 이미지 설정
-FROM openjdk:17-jdk-slim
-
-# jar 파일을 컨테이너 내부에 복사
-COPY build/libs/*.jar app.jar
-
-# 외부 호스트 8080 포트로 노출
-EXPOSE 3306
-
-# 실행 명령어
-CMD ["java", "-jar", "app.jar"]
+# jar 파일 실행
+ENTRYPOINT ["java", "-jar", "/app.jar"]

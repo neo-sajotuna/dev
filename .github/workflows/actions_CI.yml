@@ -1,3 +1,5 @@
+env:
+  DB_PASSWORD: root
 # Actions 이름 github 페이지에서 볼 수 있다.
 name: actions_CI
 
@@ -31,26 +33,38 @@ jobs:
           distribution: 'adopt' # See 'Supported distributions' for available options
           java-version: '17'
 
-      - name: make executable gradlew
-        run: chmod +x ./gradlew
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE NewNeo_BoardBuddy_test;' -uroot -p${{ secrets.DB_PASSWORD }}
+
 
       # run은 사용자 지정 스크립트 실행 Gradle을 clean 하고 test 하겠다
       - name: run unittest
-        run: |
-          ./gradlew clean test
+        uses: gradle/gradle-build-action@main
+        with:
+          gradle-version: wrapper
+          arguments: test --no-daemon
+
+      # Gradle 빌드 실행 및 JAR 파일 생성
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@main
+        with:
+          gradle-version: wrapper
+          arguments: clean build --no-daemon
 
       # 도커허브에 로그인
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 도커 이미지 업로드
       - name: Upload Docker Image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.SERVICE }}:latest
+          tags: sunchoii/neo:latest
