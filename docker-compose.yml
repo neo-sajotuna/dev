@@ -1,0 +1,9 @@
+services:
+  local-mysql:
+    image: mysql
+    container_name: newneo-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "3306:3306"
+    platform: linux/arm64
