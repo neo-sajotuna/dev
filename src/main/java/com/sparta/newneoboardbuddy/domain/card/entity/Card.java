@@ -20,10 +20,9 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
-@Table(name="Card")
+@Table(name="Card", indexes = @Index(name = "card_titles", columnList = "cardTitle"))
+// @Table(name="Card")
 @NoArgsConstructor
-
 public class Card {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

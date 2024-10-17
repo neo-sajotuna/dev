@@ -25,6 +25,26 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
     @PersistenceContext
     private EntityManager entityManager;
 
+    public List<Card> findByCardTitle(String title) {
+        QCard card = QCard.card;
+
+        return queryFactory.selectFrom(card)
+                .where(card.cardTitle.eq(title))
+                .fetch();
+    }
+
+    public Page<Card> searchCards(Long userId, Pageable pageable) {
+        QCard card = QCard.card;
+
+        List<Card> cards = queryFactory.selectFrom(card)
+                .where(card.user.id.eq(userId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(cards, pageable, cards.size());
+    }
+
     @Override
     public Page<Card> searchCards(String cardTitle, String cardContent, Long assignedMemberId , Long boardId, Pageable pageable){
 
