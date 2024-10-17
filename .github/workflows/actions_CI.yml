@@ -1,8 +1,7 @@
-# Actions 이름 github 페이지에서 볼 수 있다.
-name: actions_CI
-
 env:
   DB_PASSWORD: root
+# Actions 이름 github 페이지에서 볼 수 있다.
+name: actions_CI
 
 # Event Trigger 특정 액션 (Push, Pull_Request)등이 명시한 Branch에서 일어나면 동작을 수행한다.
 on: 
@@ -34,20 +33,17 @@ jobs:
           distribution: 'adopt' # See 'Supported distributions' for available options
           java-version: '17'
 
-      - name: make executable gradlew
-        run: chmod +x ./gradlew
-
       - name: Set up MySQL
         run: |
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE NewNeo_BoardBuddy_test;' -uroot -proot
 
-
-
       # run은 사용자 지정 스크립트 실행 Gradle을 clean 하고 test 하겠다
       - name: run unittest
-        run: |
-          ./gradlew clean test
+        uses: gradle/gradle-build-action@main
+        with:
+          gradle-version: wrapper
+          arguments: test --no-daemon
 
       # 도커허브에 로그인
       - name: Login to DockerHub
