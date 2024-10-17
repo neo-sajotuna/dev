@@ -34,4 +34,4 @@ jobs:
             docker pull sunchoii/neo:latest
 
             # 새로운 컨테이너 실행
-            docker run -d -p 8080:8080 --name neo -e JWT_SECRET_KEY=${{JWT_SECRET_KEY}} -e CLOUD_AWS_CREDENTIALS_SECRETKEY=${{AWS_SECRET_KEY}} -e CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{AWS_ACCESS_KEY}} sunchoii/neo:latest
+            docker run -d -p 8080:8080 --name neo -e JWT_SECRET_KEY=${{secrets.JWT_SECRET_KEY}} -e CLOUD_AWS_CREDENTIALS_SECRETKEY=${{secrets.AWS_SECRET_KEY}} -e CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{secrets.AWS_ACCESS_KEY}} sunchoii/neo:latest
