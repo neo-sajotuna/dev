@@ -9,7 +9,9 @@ import org.springframework.util.StopWatch;
 
 import java.util.List;
 
-@SpringBootTest
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class NewNeoBoardBuddyApplicationTests {
 
     @Autowired
