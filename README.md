@@ -13,7 +13,7 @@
 
 |최선|박현국|김건우|오현택|
 |:---:|:---:|:---:|:---:|
-|[@Seon](https://github.com/sunchoiii)|[@HyunKook](https://hyunkook.tistory.com/)|[@KeunWoo](https://choni.tistory.com)|[@HyunTaek](https://oht2050.tistory.com/)|
+|[@Sun](https://github.com/sunchoiii)|[@HyunKook](https://hyunkook.tistory.com/)|[@KeunWoo](https://choni.tistory.com)|[@HyunTaek](https://oht2050.tistory.com/)|
 |WorkSpace, Board, CI/CD|Card, Concurrency Control|List, Alram, Indexing|Comment, AWS S3, Redis|
 
 <br>
@@ -173,7 +173,7 @@
 
 ### ERD
 
-![erd](https://github.com/user-attachments/assets/9a8211e6-f91b-4aa6-bc4e-4b171d3b101e)
+![스크린샷 2024-10-18 오후 12 01 25](https://github.com/user-attachments/assets/47dca19e-2f8e-426b-a5ec-f8e96d8b0b4f)
 <br>
 
 <div align=center>
