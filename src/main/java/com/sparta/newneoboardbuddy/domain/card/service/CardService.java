@@ -54,16 +54,11 @@ public class CardService {
 
     private final HierarchyUtil hierarchyUtil;
 
-    /**
-     * 카드를 생성하는 메서드
-     * @param listId Card를 생성할 List Id
-     * @param request Card생성에 필요한 정보가 담긴 Request
-     * @param authUser Filter에서 인증이 완료된 유저 정보
-     * @return 생성된 Card 정보가 담긴 Dto
-     */
     @Transactional
     public CardCreateResponse createCard(Long listId, AuthUser authUser, CardCreateRequest request) {
         User user = User.fromUser(authUser);
+
+        // 혹시 모르니 이부분은 안바꾸겠습니다.
         Member member = memberService.verifyMember(authUser, request.getWorkspaceId());
         System.out.println("member = " + member);
 
@@ -101,6 +96,19 @@ public class CardService {
         );
         Card savedCard = cardRepository.save(newCard);
 
+        // 파일 저장 로직
+//        if (request.getFile() != null || !request.getFile().isEmpty()) {
+//            FileUploadDto fileUploadDto = FileUploadDto.builder()
+//                    .targetId(savedCard.getCardId())
+//                    .targetTable("card")
+//                    .targetFile(request.getFile())
+//                    .build();
+
+//            fileService.uploadFile(fileUploadDto);
+            // 파일 저장 로직
+//        }
+
+
         logCardActivity(savedCard, Action.CREATED, "제목: " + savedCard.getCardTitle()  +
                 ", 내용 : " + savedCard.getCardContent() +
                 ", 관리 멤버 :" + " -> " + assignedMember);
@@ -116,13 +124,7 @@ public class CardService {
 
     }
 
-    /**
-     * 카드 정보를 수정하는 메서드
-     * @param cardId 수정할 Card Id
-     * @param authUser Filter에서 인증이 완료된 유저 정보
-     * @param request 카드 수정에 필요한 Request 정보
-     * @return 수정된 카드 정보가 담긴 Dto객체
-     */
+
     public CardUpdateResponse updateCard(Long cardId, AuthUser authUser, CardUpdateRequest request) {
         // 카드 추가될 리스트  (낙관적 락)
         Card card = cardRepository.findByIdWithJoinFetchToWorkspace(cardId).orElseThrow(() ->
@@ -155,6 +157,8 @@ public class CardService {
             card.setMember(assignedMember);
         }
 
+
+
         // 낙관적 락 적용
         Card updateCard = cardRepository.save(card);
         logCardActivity(updateCard, Action.UPDATED, "제목: " + oldTitle + " -> " + updateCard.getCardTitle() +
@@ -169,23 +173,16 @@ public class CardService {
     }
 
 
-    /**
-     * 낙관적 Lock 해당 Card에 참조한 횟수를 증가 시켜주는 메서드 ( Test Code에서 사용 )
-     * @param cardId 조회할 카드 Id
-     */
+    // 낙관적 락 사용
     @Transactional
     public void incrementCount(Long cardId){
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("카드 없다"));
         card.addTestCount();
+        cardRepository.save(card);
     }
 
-    /**
-     * 해당 카드에 변경 로그를 남기는 메서드
-     * @param card 로그를 남길 Card 객체
-     * @param action 카드가 변경된 상황 ( 생성, 변경 )
-     * @param details 상세 설명 / 생성 : title & 변경 : before title -> after title
-     */
+    // 활동 로그 메서드
     private void logCardActivity(Card card, Action action, String details) {
         CardActivityLog activityLog = new CardActivityLog();
         activityLog.setCard(card);
@@ -196,11 +193,6 @@ public class CardService {
         cardActivityLogRepository.save(activityLog);
     }
 
-    /**
-     * 해당 카드의 변경 로그까지 반환하는 메서드
-     * @param cardId 조회 & 반환할 CardId
-     * @return 변경 로그까지 담긴 CardDetail Dto
-     */
     @Transactional(readOnly = true)
     public CardDetailResponse getCardDetails(Long cardId) {
         Card card = cardRepository.findById(cardId)
@@ -232,11 +224,7 @@ public class CardService {
         );
     }
 
-    /**
-     * 카드를 삭제하는 메서드
-     * @param cardId 삭제할 Card Id
-     * @param authUser Filter에서 인증이 완료된 유저 정보
-     */
+
     public void deleteCard(Long cardId, AuthUser authUser) {
         // 카드 조회
         // 카드 추가될 리스트 조회
@@ -255,16 +243,11 @@ public class CardService {
         cardRepository.delete(card);
     }
 
-    /**
-     * Null이 아닌 조건 내용 모두 포함하고 있는 카드들을 페이징하여 반환하는 메서드
-     * @param cardTitle Card.title에 cardTitle의 내용이 들어 있는지 확인할 문자열
-     * @param cardContent Card.content에 cardContent의 내용이 들어 있는지 확인할 문자열
-     * @param assignedMemberId Card.userId에 assignedMemberId와 일치 여부를 확인할 Card와 동일한 Space에 소속인 UserId
-     * @param boardId Card.board.boardId와 일치 여부를 확인할 boardId
-     * @param pageable 페이징 조건
-     * @return 위 내용 중 하나라도 만족하는 페이징 된 Card객체
-     */
     public Page<CardCreateResponse> searchCards(String cardTitle, String cardContent, Long assignedMemberId, Long boardId, Pageable pageable) {
         return new PageImpl<>(cardRepository.searchCards(cardTitle, cardContent, assignedMemberId, boardId, pageable).stream().map(CardCreateResponse::new).toList());
+    }
+
+    public Page<Card> searchCards(Long assignedMemberId, Pageable pageable) {
+        return cardRepository.searchCards(assignedMemberId, pageable);
     }
 }
