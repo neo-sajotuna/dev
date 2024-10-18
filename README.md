@@ -171,6 +171,11 @@
 
 <br><br><br><br>
 
+### ERD
+
+![erd](https://github.com/user-attachments/assets/9a8211e6-f91b-4aa6-bc4e-4b171d3b101e)
+<br>
+
 <div align=center>
 
 ![DKDKDKDKDKDK](https://github.com/user-attachments/assets/b4a6ba71-9251-40ca-8017-02a069f4a734)
