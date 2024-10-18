@@ -6,13 +6,16 @@ import com.sparta.newneoboardbuddy.domain.card.entity.Card;
 import com.sparta.newneoboardbuddy.domain.list.entity.BoardList;
 import com.sparta.newneoboardbuddy.domain.member.entity.Member;
 import com.sparta.newneoboardbuddy.domain.user.entity.User;
+import com.sparta.newneoboardbuddy.domain.user.enums.UserRole;
 import com.sparta.newneoboardbuddy.domain.workspace.entity.Workspace;
 import com.sparta.newneoboardbuddy.dummy.config.DataHub;
 import com.sparta.newneoboardbuddy.dummy.config.DummyDataFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +31,7 @@ public class CreateDummyDataTest {
 
     @Autowired
     DataHub datahub;
-
+//
 //    @Test
 //    void contextLoads() throws IOException {
 //        User user = new User();
@@ -38,7 +41,7 @@ public class CreateDummyDataTest {
 //
 //        slackNotificationUtil.sendNewUser(user);
 //    }
-
+//
 //    @Test
 //    void createDummySet() {
 //        int userSize = 10;
