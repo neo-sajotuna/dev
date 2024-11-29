@@ -3,6 +3,7 @@ package com.sparta.newneoboardbuddy.domain.card.service;
 import com.sparta.newneoboardbuddy.common.dto.AuthUser;
 import com.sparta.newneoboardbuddy.common.exception.InvalidRequestException;
 import com.sparta.newneoboardbuddy.common.exception.NotFoundException;
+import com.sparta.newneoboardbuddy.common.service.RedisService;
 import com.sparta.newneoboardbuddy.config.HierarchyUtil;
 import com.sparta.newneoboardbuddy.domain.board.entity.Board;
 import com.sparta.newneoboardbuddy.domain.board.exception.BoardNotFoundException;
@@ -51,6 +52,7 @@ public class CardService {
     private final FileService fileService;
 
     private final WorkspaceRepository workspaceRepository;
+    private final RedisService redisService;
 
     private final HierarchyUtil hierarchyUtil;
 
@@ -202,7 +204,9 @@ public class CardService {
      * @return 변경 로그까지 담긴 CardDetail Dto
      */
     @Transactional(readOnly = true)
-    public CardDetailResponse getCardDetails(Long cardId) {
+    public CardDetailResponse getCardDetails(AuthUser authUser, Long cardId) {
+
+//        System.out.println(1);
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(()-> new NotFoundException("카드가 없다."));
 
@@ -212,6 +216,9 @@ public class CardService {
         // 카드 활동 내역 조회
         LogResponseDto activityLogDto = new LogResponseDto(activityLog);
 
+        // 카드 조회 시 조회카운트
+        redisService.incrementCardView("card", cardId, authUser.getId());
+
         // 카드 댓글 조회
         List<CommentSaveResponseDto> commentsDto = card.getComments().stream()
                 .map(comment -> new CommentSaveResponseDto(
@@ -220,6 +227,8 @@ public class CardService {
                         comment.getEmoji(),
                         comment.getCreatedAt()))
                 .toList();
+
+        System.out.println(1);
 
         return new CardDetailResponse(
                 card.getCardId(),

@@ -18,6 +18,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Table(name="Card", indexes = @Index(name = "card_titles", columnList = "cardTitle"))
 //@Table(name="Card")
 @NoArgsConstructor

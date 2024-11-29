@@ -23,4 +23,5 @@ public interface CardRepository extends JpaRepository<Card, Long>, CardRepositor
             "where c.cardId = :cardId")
     Optional<Card> findByIdWithJoinFetchToWorkspace(Long cardId);
 
+
 }
